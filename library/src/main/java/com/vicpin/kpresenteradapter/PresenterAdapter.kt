@@ -5,9 +5,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import com.vicpin.kpresenteradapter.extensions.inflate
 import com.vicpin.kpresenteradapter.extensions.refreshData
-import com.vicpin.kpresenteradapter.listeners.ItemClickListener
-import com.vicpin.kpresenteradapter.listeners.ItemLongClickListener
-import com.vicpin.kpresenteradapter.listeners.OnLoadMoreListener
 import com.vicpin.kpresenteradapter.model.ViewInfo
 import com.vicpin.kpresenteradapter.model.createViewHolder
 import com.vicpin.kpresenteradapter.viewholder.LoadMoreViewHolder
@@ -28,9 +25,9 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
     /**
      * Event listeners
      */
-    var itemClickListener: ItemClickListener<T>? = null
-    var itemLongClickListener: ItemLongClickListener<T>? = null
-    var loadMoreListener: OnLoadMoreListener? = null
+    var itemClickListener: ((item: T, view: ViewHolder<T>) -> Unit)? = null
+    var itemLongClickListener: ((item: T, view: ViewHolder<T>) -> Unit)? = null
+    var loadMoreListener: (() -> Unit)? = null
 
     /**
      * Sets a custom listener instance. You can call to the listener from your ViewHolder classes with getCustomListener() method.
@@ -127,17 +124,17 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
     private fun notifyLoadMoreReached() {
         if (loadMoreListener != null && !loadMoreInvoked) {
             loadMoreInvoked = true
-            loadMoreListener?.onLoadMore()
+            loadMoreListener?.invoke()
         }
     }
 
     private fun appendListeners(viewHolder: ViewHolder<T>){
         if(itemClickListener != null){
-            viewHolder.itemView.setOnClickListener { itemClickListener?.onItemClick(getItem(viewHolder.adapterPosition), viewHolder) }
+            viewHolder.itemView.setOnClickListener { itemClickListener?.invoke(getItem(viewHolder.adapterPosition), viewHolder) }
         }
 
         if(itemLongClickListener != null){
-            viewHolder.itemView.setOnClickListener { itemLongClickListener?.onItemLongClick(getItem(viewHolder.adapterPosition), viewHolder) }
+            viewHolder.itemView.setOnLongClickListener { itemLongClickListener?.invoke(getItem(viewHolder.adapterPosition), viewHolder); true }
         }
     }
 
@@ -169,8 +166,8 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
      * @param data items collection
      * @return PresenterAdapter called instance
      */
-    fun setData(data: MutableList<T>) : PresenterAdapter<T>{
-        this.data = data
+    fun setData(data: List<T>) : PresenterAdapter<T>{
+        this.data = data.toMutableList()
         this.loadMoreInvoked = false
         notifyDataSetChanged()
         return this
@@ -198,7 +195,7 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
      * @param data items collection to append at the end of the current collection
      * @return PresenterAdapter called instance
      */
-    fun addData(data: MutableList<T>){
+    fun addData(data: List<T>){
 
         this.loadMoreInvoked = false
         val currentItemCount = itemCount
@@ -292,10 +289,11 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
      * Enable load more option for paginated collections
      * @param loadMoreListener
      */
-    fun enableLoadMore(loadMoreListener: OnLoadMoreListener) {
+    fun enableLoadMore(loadMoreListener:  (() -> Unit)?) {
         this.loadMoreEnabled = true
         this.loadMoreInvoked = false
         this.loadMoreListener = loadMoreListener
+        notifyItemInserted(itemCount)
     }
 
     /**

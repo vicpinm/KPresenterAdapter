@@ -8,11 +8,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.vicpin.kpresenteradapter.PresenterAdapter
 import com.vicpin.kpresenteradapter.SimplePresenterAdapter
-import com.vicpin.kpresenteradapter.ViewHolder
 import com.vicpin.kpresenteradapter.extensions.inflate
-import com.vicpin.kpresenteradapter.listeners.ItemClickListener
-import com.vicpin.kpresenteradapter.listeners.ItemLongClickListener
-import com.vicpin.kpresenteradapter.listeners.OnLoadMoreListener
 import com.vicpin.kpresenteradapter.model.ViewInfo
 import com.vicpin.sample.R
 import com.vicpin.sample.extensions.showToast
@@ -29,7 +25,7 @@ import kotlinx.android.synthetic.main.fragment_main.*
 /**
  * Created by Victor on 25/06/2016.
  */
-class MainFragment : Fragment(), ItemClickListener<Country>, ItemLongClickListener<Country>, ItemRecycledListener, ItemDeletedListener<Country>, OnLoadMoreListener {
+class MainFragment : Fragment(), ItemRecycledListener, ItemDeletedListener<Country> {
 
     private var lastPresentersRecycled: Int = 0
     private var currentPage: Int = 0
@@ -49,13 +45,15 @@ class MainFragment : Fragment(), ItemClickListener<Country>, ItemLongClickListen
         adapter = SimplePresenterAdapter(CountryView::class, R.layout.adapter_country)
         adapter.setData(data)
         adapter.addHeader(ViewInfo(HeaderView::class, R.layout.adapter_header))
-        adapter.enableLoadMore(this)
+        adapter.enableLoadMore { onLoadMore() }
+
+
     }
 
     fun appendListeners() {
         adapter.apply {
-            itemClickListener = this@MainFragment
-            itemLongClickListener = this@MainFragment
+            itemClickListener = { item, view -> showToast("Country clicked: " + item.name) }
+            itemLongClickListener = { item, view -> showToast("Country long pressed: " + item.name) }
             customListener = this@MainFragment
         }
     }
@@ -65,10 +63,6 @@ class MainFragment : Fragment(), ItemClickListener<Country>, ItemLongClickListen
         list.adapter = adapter
     }
 
-    override fun onItemClick(item: Country, view: ViewHolder<Country>) = showToast("Country clicked: " + item.name)
-
-    override fun onItemLongClick(item: Country, view: ViewHolder<Country>) = showToast("Country long pressed: " + item.name)
-
     override fun onItemRecycled(presenterId: Int) {
         lastPresenterDestroyed.text = "Last presenters recycled: $lastPresentersRecycled - $presenterId"
         lastPresentersRecycled = presenterId
@@ -77,7 +71,7 @@ class MainFragment : Fragment(), ItemClickListener<Country>, ItemLongClickListen
     /**
      * Pagination listener. Simulates a 1500ms load delay.
      */
-    override fun onLoadMore() {
+    fun onLoadMore() {
         Handler().postDelayed({
             currentPage++
             val newData = CountryRepository.getItemsPage(resources, currentPage)

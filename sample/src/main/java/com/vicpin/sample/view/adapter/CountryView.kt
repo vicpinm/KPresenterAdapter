@@ -60,7 +60,7 @@ class CountryView(itemView: View) : ViewHolder<Country>(itemView), CountryPresen
         presenter.onDeleteItem()
     }
 
-    override fun deleteItem(item: Country) {
-        (customListener as? ItemDeletedListener<Country>)?.onItemDeleted(item)
+    override fun deleteItem(data: Country) {
+        (customListener as? ItemDeletedListener<Country>)?.onItemDeleted(data)
     }
 }
