@@ -21,6 +21,7 @@ abstract class ViewHolder<T: Any> : RecyclerView.ViewHolder {
     fun onBind(data: List<T>, position: Int){
         setupPresenter(data)
         presenter?.data = data[position]
+        presenter?.position = position
         presenter?.onCreate()
     }
 

@@ -13,6 +13,7 @@ abstract class ViewHolderPresenter<Data : Any, PresenterView: Any> {
 
     var view: PresenterView? = null
     lateinit var data: Data
+    var position = 0
     lateinit var dataCollection: List<Data>
     val presenterId: Int by lazy { presenterIdsGenerator.andIncrement }
 
