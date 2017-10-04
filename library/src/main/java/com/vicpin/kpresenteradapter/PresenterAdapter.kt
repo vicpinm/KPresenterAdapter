@@ -313,5 +313,7 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
         }
     }
 
+    fun getData() = data
+
 
 }
