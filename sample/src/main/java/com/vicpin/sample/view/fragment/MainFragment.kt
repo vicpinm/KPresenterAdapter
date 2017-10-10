@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.vicpin.kpresenteradapter.PresenterAdapter
 import com.vicpin.kpresenteradapter.SimplePresenterAdapter
+import com.vicpin.kpresenteradapter.SingleLinePresenterAdapter
 import com.vicpin.kpresenteradapter.extensions.inflate
 import com.vicpin.kpresenteradapter.model.ViewInfo
 import com.vicpin.sample.R
@@ -30,11 +31,16 @@ class MainFragment : Fragment(), ItemRecycledListener, ItemDeletedListener<Count
     private var lastPresentersRecycled: Int = 0
     private var currentPage: Int = 0
     private lateinit var adapter: PresenterAdapter<Country>
+    private var isSingleAdapter = false
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) = container?.inflate(R.layout.fragment_main)
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        initView()
+    }
+
+    fun initView(){
         setupAdapter()
         appendListeners()
         setupRecyclerView()
@@ -42,7 +48,12 @@ class MainFragment : Fragment(), ItemRecycledListener, ItemDeletedListener<Count
 
     fun setupAdapter() {
         val data = CountryRepository.getItemsPage(resources, 0)
-        adapter = SimplePresenterAdapter(CountryView::class, R.layout.adapter_country)
+        if(isSingleAdapter){
+            adapter = SingleLinePresenterAdapter(R.layout.adapter_country_single_line)
+        }
+        else {
+            adapter = SimplePresenterAdapter(CountryView::class, R.layout.adapter_country)
+        }
         adapter.setData(data)
         adapter.addHeader(ViewInfo(HeaderView::class, R.layout.adapter_header))
         adapter.enableLoadMore { onLoadMore() }
@@ -87,5 +98,10 @@ class MainFragment : Fragment(), ItemRecycledListener, ItemDeletedListener<Count
     override fun onItemDeleted(item: Country) {
         adapter.removeItem(item)
         adapter.updateHeaders()
+    }
+
+    fun toggleAdapter() {
+        isSingleAdapter = !isSingleAdapter
+        initView()
     }
 }

@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply from: 'maven-push.gradle'
+apply plugin: 'com.github.dcendents.android-maven'
+group = 'com.github.vicpinm'
 
 android {
     compileSdkVersion 25
