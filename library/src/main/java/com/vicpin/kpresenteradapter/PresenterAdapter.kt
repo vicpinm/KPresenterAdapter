@@ -221,8 +221,9 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
 
     fun removeItem(item: T){
         if(this.data.contains(item)){
-            notifyItemRemoved(getPositionWithHeaders(this.data.indexOf(item)))
+            val pos = this.data.indexOf(item)
             this.data.remove(item)
+            notifyItemRemoved(getPositionWithHeaders(pos))
         }
     }
 
