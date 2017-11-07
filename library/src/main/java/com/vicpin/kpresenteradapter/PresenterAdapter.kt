@@ -104,7 +104,9 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
 
     override fun onBindViewHolder(holder: ViewHolder<T>, position: Int) {
         if(isNormalPosition(position)) {
-            holder.onBind(data, getPositionWithoutHeaders(position))
+            holder.onBind(data, getPositionWithoutHeaders(position), deleteListener = {
+                removeItem(it)
+            })
             appendListeners(holder)
         }
         else if(isHeaderPosition(position)){

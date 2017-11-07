@@ -32,6 +32,7 @@ class CountryPresenter : ViewHolderPresenter<Country, CountryPresenter.View>() {
     }
 
     fun onDeleteItem() {
+        deleteItemFromCollection()
         view?.deleteItem(data)
     }
 

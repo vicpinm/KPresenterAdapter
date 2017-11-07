@@ -18,8 +18,8 @@ abstract class ViewHolder<T: Any> : RecyclerView.ViewHolder {
         context = itemView.context
     }
 
-    fun onBind(data: List<T>, position: Int){
-        setupPresenter(data)
+    fun onBind(data: List<T>, position: Int, deleteListener: (T) -> Unit){
+        setupPresenter(data, deleteListener)
         presenter?.data = data[position]
         presenter?.position = position
         presenter?.onCreate()
@@ -35,13 +35,14 @@ abstract class ViewHolder<T: Any> : RecyclerView.ViewHolder {
     }
 
 
-    private fun setupPresenter(data: List<T>){
+    private fun setupPresenter(data: List<T>, listener: ((T) -> Unit)? = null){
         presenter?.setPresenterView(this)
         presenter?.dataCollection = data
+        presenter?.setDeleteListener = listener
     }
 
 
     fun onDestroy(){
-        presenter?.onDestroy()
+        presenter?.onPreDestroy()
     }
 }

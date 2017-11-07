@@ -96,7 +96,6 @@ class MainFragment : Fragment(), ItemRecycledListener, ItemDeletedListener<Count
     }
 
     override fun onItemDeleted(item: Country) {
-        adapter.removeItem(item)
         adapter.updateHeaders()
     }
 
