@@ -309,7 +309,10 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
     }
 
     override fun getItemId(position: Int): Long {
-        if (hasStableIds()) {
+        if(isLoadMorePosition(position)){
+            return LOAD_MORE_TYPE.toLong()
+        }
+        else if (hasStableIds()) {
             return if (position < getHeadersCount()) headers[position].hashCode().toLong() else getItem(position).hashCode().toLong()
         } else {
             return super.getItemId(position)
