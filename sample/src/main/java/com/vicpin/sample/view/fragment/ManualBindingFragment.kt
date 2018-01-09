@@ -21,12 +21,10 @@ import com.vicpin.sample.view.interfaces.ItemDeletedListener
 import com.vicpin.sample.view.interfaces.ItemRecycledListener
 import kotlinx.android.synthetic.main.fragment_main.*
 
-
-
 /**
  * Created by Victor on 25/06/2016.
  */
-class MainFragment : Fragment(), ItemRecycledListener, ItemDeletedListener<Country> {
+class ManualBindingFragment : Fragment(), ItemRecycledListener, ItemDeletedListener<Country> {
 
     private var lastPresentersRecycled: Int = 0
     private var currentPage: Int = 0
@@ -65,7 +63,7 @@ class MainFragment : Fragment(), ItemRecycledListener, ItemDeletedListener<Count
         adapter.apply {
             itemClickListener = { item, view -> showToast("Country clicked: " + item.name) }
             itemLongClickListener = { item, view -> showToast("Country long pressed: " + item.name) }
-            customListener = this@MainFragment
+            customListener = this@ManualBindingFragment
         }
     }
 

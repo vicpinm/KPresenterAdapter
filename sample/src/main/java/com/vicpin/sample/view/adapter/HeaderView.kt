@@ -16,7 +16,7 @@ class HeaderView(itemView: View) : ViewHolder<Country>(itemView), HeaderPresente
 
     override var presenter = HeaderPresenter()
 
-    @BindView(R.id.header)
+    @BindView(R.id.text)
     lateinit var mHeader: TextView
 
     init {
