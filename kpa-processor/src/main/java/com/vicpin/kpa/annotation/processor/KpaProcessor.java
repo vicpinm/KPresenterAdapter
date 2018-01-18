@@ -19,13 +19,19 @@ public class KpaProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 
         EnvironmentUtil.init(processingEnv);
-        Model model = buildModel(roundEnv);
-        for (Model.EntityModel entity : model.getEntities()) {
 
+        Model model = buildModel(roundEnv);
+
+        if(model.getEntities().size() == 0) {
+            return false;
+        }
+
+        for (Model.EntityModel entity : model.getEntities()) {
             createViewHolderClassFor(entity);
             createPresenterClassFor(entity);
             createAdapterClassFor(entity);
         }
+
 
         return true;
     }

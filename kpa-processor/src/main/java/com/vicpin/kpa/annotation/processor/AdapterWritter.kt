@@ -3,9 +3,6 @@ package com.vicpin.kpa.annotation.processor
 import com.vicpin.kpa.annotation.processor.model.Model
 import java.io.File
 import java.io.IOException
-import java.io.OutputStreamWriter
-import java.nio.charset.StandardCharsets
-import java.nio.file.Files
 import javax.annotation.processing.ProcessingEnvironment
 
 /**
@@ -15,7 +12,7 @@ class AdapterWritter(private val entity: Model.EntityModel) {
 
     private var text: String = ""
     private val className: String
-
+    val KAPT_KOTLIN_GENERATED_OPTION = "kapt.kotlin.generated"
     init {
         this.className = entity.name + ADAPTER_SUFIX
     }
@@ -56,24 +53,14 @@ class AdapterWritter(private val entity: Model.EntityModel) {
 
     fun generateFile(env: ProcessingEnvironment) {
 
-        try { // write the file
+        try { // write the env
+            val options = env.options
+            val kotlinGenerated = options[KAPT_KOTLIN_GENERATED_OPTION] ?: ""
 
-            val outputPath = File(env.options["kapt.kotlin.generated"],"${entity.pkg}.$className").toPath().resolve("$className.kt")
-            EnvironmentUtil.logWarning("generando $outputPath")
+            File(kotlinGenerated.replace("kaptKotlin","kapt"), "$className.kt").writer().buffered().use {
+                it.appendln(generateClass())
+            }
 
-            OutputStreamWriter(Files.newOutputStream(outputPath), StandardCharsets.UTF_8).use { writer -> writer.append(text) }
-
-
-                    //FileSpec.builder(entity.pkg, "$className.kt").build().writeTo(File("${entity.pkg}.$className.kt"))
-           // EnvironmentUtil.logWarning("generando ${entity.pkg}.$className.kt")
-
-            /*EnvironmentUtil.logWarning("generando ${entity.pkg}.$className.kt")
-            val source = env.filer.createSourceFile("${entity.pkg}.$className.kt")
-
-            val writer = source.openWriter()
-            writer.write(generateClass())
-            writer.flush()
-            writer.close()*/
         } catch (e: IOException) {
             // Note: calling e.printStackTrace() will print IO errors
             // that occur from the file already existing after its first run, this is normal

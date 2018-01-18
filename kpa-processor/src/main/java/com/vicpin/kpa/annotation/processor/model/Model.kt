@@ -17,30 +17,22 @@ class Model private constructor() {
     private fun parseAnnotation(env: RoundEnvironment, annotationClass: Class<Annotation>) {
         val annotatedClasses = env.getElementsAnnotatedWith(annotationClass)
 
-
         for (annotatedClass in annotatedClasses) {
             if (annotatedClass.kind != ElementKind.CLASS) {
                 EnvironmentUtil.logError(annotationClass.simpleName + " can only be used for classes")
                 break
             }
 
-            val entity = createEntityModel(annotatedClass)
-
-            entities.add(entity)
+            createEntityModel(annotatedClass)
 
         }
 
     }
 
     private fun createEntityModel(annotatedClass: Element): EntityModel {
-
-            val entityModel = EntityModel(annotatedClass, getPackpageFor(annotatedClass))
-            entities.add(entityModel)
-
-
+        val entityModel = EntityModel(annotatedClass, getPackpageFor(annotatedClass))
+        entities.add(entityModel)
         return entityModel
-
-
     }
 
     private fun getPackpageFor(parentClass: Element): String {

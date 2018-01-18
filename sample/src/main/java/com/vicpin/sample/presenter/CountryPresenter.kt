@@ -28,7 +28,7 @@ class CountryPresenter : ViewHolderPresenter<Country, CountryPresenter.View>() {
     }
 
     fun setCountryImage() {
-        view?.setImage(data!!.imageResourceId)
+        view?.setImage(data.imageResourceId)
     }
 
     fun onDeleteItem() {

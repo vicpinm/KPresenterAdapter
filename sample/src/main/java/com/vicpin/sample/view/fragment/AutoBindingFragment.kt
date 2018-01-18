@@ -12,6 +12,7 @@ import com.vicpin.sample.R
 import com.vicpin.sample.extensions.showToast
 import com.vicpin.sample.model.CitiesRepository
 import com.vicpin.sample.model.Town
+import com.vicpin.sample.model.TownPresenterAdapter
 import kotlinx.android.synthetic.main.fragment_main.*
 
 
@@ -20,9 +21,7 @@ import kotlinx.android.synthetic.main.fragment_main.*
  * Created by Victor on 25/06/2016.
  */
 class AutoBindingFragment : Fragment() {
-
-    //Falta: la clase *ViewHolderParent no la reconoce al importarla, no se genera en el directorio correcto
-
+    
     private var currentPage: Int = 0
     private lateinit var adapter: PresenterAdapter<Town>
 
@@ -41,7 +40,7 @@ class AutoBindingFragment : Fragment() {
 
     fun setupAdapter() {
         val data = CitiesRepository.getItemsPage(resources, 0)
-        //adapter = TownPresenterAdapter(R.layout.adapter_town)
+        adapter = TownPresenterAdapter(R.layout.adapter_town)
         adapter.setData(data)
         adapter.enableLoadMore { onLoadMore() }
 
