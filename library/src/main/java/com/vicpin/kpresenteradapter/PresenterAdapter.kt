@@ -1,6 +1,7 @@
 package com.vicpin.kpresenteradapter
 
 import android.os.Handler
+import android.support.annotation.LayoutRes
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import com.vicpin.kpresenteradapter.extensions.inflate
@@ -9,6 +10,7 @@ import com.vicpin.kpresenteradapter.model.ViewInfo
 import com.vicpin.kpresenteradapter.model.createViewHolder
 import com.vicpin.kpresenteradapter.viewholder.LoadMoreViewHolder
 import java.util.*
+import kotlin.reflect.KClass
 
 /**
  * Created by Victor on 01/11/2016.
@@ -152,8 +154,9 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
 
     fun getItem(position: Int) = data[getPositionWithoutHeaders(position)]
 
-    fun addHeader(headerInfo: ViewInfo<T>){
-        this.headers.add(headerInfo)
+
+    fun addHeader(@LayoutRes layout: Int, viewHolderClass: KClass<out ViewHolder<T>>? = null){
+        this.headers.add(ViewInfo(viewHolderClass, layout))
         HEADER_MAX_TYPE = HEADER_TYPE + headers.size
     }
 
@@ -303,9 +306,11 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
      * Disable load more option
      */
     fun disableLoadMore() {
-        this.loadMoreEnabled = false
-        this.loadMoreInvoked = false
-        notifyItemRemoved(itemCount)
+        if(this.loadMoreEnabled) {
+            this.loadMoreEnabled = false
+            this.loadMoreInvoked = false
+            notifyItemRemoved(itemCount)
+        }
     }
 
     override fun getItemId(position: Int): Long {

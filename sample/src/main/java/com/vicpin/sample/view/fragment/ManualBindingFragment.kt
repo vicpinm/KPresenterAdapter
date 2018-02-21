@@ -10,7 +10,6 @@ import com.vicpin.kpresenteradapter.PresenterAdapter
 import com.vicpin.kpresenteradapter.SimplePresenterAdapter
 import com.vicpin.kpresenteradapter.SingleLinePresenterAdapter
 import com.vicpin.kpresenteradapter.extensions.inflate
-import com.vicpin.kpresenteradapter.model.ViewInfo
 import com.vicpin.sample.R
 import com.vicpin.sample.extensions.showToast
 import com.vicpin.sample.model.Country
@@ -53,7 +52,7 @@ class ManualBindingFragment : Fragment(), ItemRecycledListener, ItemDeletedListe
             adapter = SimplePresenterAdapter(CountryView::class, R.layout.adapter_country)
         }
         adapter.setData(data)
-        adapter.addHeader(ViewInfo(HeaderView::class, R.layout.adapter_header))
+        adapter.addHeader(R.layout.adapter_header, HeaderView::class)
         adapter.enableLoadMore { onLoadMore() }
 
 
