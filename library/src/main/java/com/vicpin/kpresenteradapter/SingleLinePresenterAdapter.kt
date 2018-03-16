@@ -13,7 +13,7 @@ class SingleLinePresenterAdapter<T: Any>(@LayoutRes val layoutResourceId: Int) :
 
     override fun getViewInfo(position: Int) = ViewInfo(SingleLineViewHolder::class as KClass<out ViewHolder<T>>, layoutResourceId)
 
-    class SingleLineViewHolder<T: Any>(view: View): ViewHolder<T>(view), SingleLinePresenter.View {
+    class SingleLineViewHolder<T: Any>(override val containerView: View): ViewHolder<T>(containerView), SingleLinePresenter.View {
 
         override var presenter = SingleLinePresenter<T>()
 

@@ -6,7 +6,7 @@ dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.squareup:javapoet:1.8.0'
-    implementation project(":kpa-annotation")
+    implementation "com.github.vicpinm:kpresenteradapter-annotations:2.0.0"
     compile 'com.squareup:kotlinpoet:0.6.0'
 
 }

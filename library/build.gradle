@@ -1,11 +1,26 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.30"
+    }
+}
+
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'com.github.dcendents.android-maven'
-group = 'com.github.vicpinm'
+apply plugin: "org.jetbrains.kotlin.android.extensions"
+apply from: 'maven-push.gradle'
 
 android {
     compileSdkVersion 25
     buildToolsVersion '26.0.2'
+
+    androidExtensions {
+        experimental = true
+    }
 
     defaultConfig {
         minSdkVersion 14
@@ -31,7 +46,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:25.0.1'
     compile "com.github.vicpinm:autosubscription:1.0.2"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    api project(':kpa-annotation')
+    compile "com.github.vicpinm:kpresenteradapter-annotations:2.0.0"
 
 }
 repositories {

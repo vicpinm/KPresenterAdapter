@@ -9,7 +9,7 @@ import com.vicpin.kpresenteradapter.extensions.inflate
 /**
  * Created by Victor on 01/11/2016.
  */
-class LoadMoreViewHolder<T: Any> private constructor(view: View): ViewHolder<T>(view){
+class LoadMoreViewHolder<T: Any> private constructor(override val containerView: View): ViewHolder<T>(containerView){
 
     override val presenter = null
 

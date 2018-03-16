@@ -24,6 +24,7 @@ class ViewHolderWritter(private val entity: Model.EntityModel) {
         appendPrimaryConstructor()
         appendGetPresenterMethod()
         appendBindMethod()
+        appendGetContainerViewMethod()
         appendClassEnding()
 
         return text
@@ -70,6 +71,9 @@ class ViewHolderWritter(private val entity: Model.EntityModel) {
         newLine("}", newLine = true, level = 1)
     }
 
+    private fun appendGetContainerViewMethod() {
+        newLine("@Override public View getContainerView() { return itemView; }", level = 1)
+    }
 
     private fun appendClassEnding() {
         newLine("}")

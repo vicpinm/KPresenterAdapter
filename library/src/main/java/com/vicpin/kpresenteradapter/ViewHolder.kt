@@ -3,16 +3,19 @@ package com.vicpin.kpresenteradapter
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import kotlinx.android.extensions.LayoutContainer
 
 /**
  * Created by Victor on 01/11/2016.
  */
-abstract class ViewHolder<T: Any> : RecyclerView.ViewHolder {
+abstract class ViewHolder<T: Any> : RecyclerView.ViewHolder, LayoutContainer {
 
     abstract val presenter: ViewHolderPresenter<T, *>?
     val context: Context
     var customListener: Any? = null
 
+    override val containerView: View?
+        get() = itemView
 
     constructor(itemView: View) : super(itemView){
         context = itemView.context

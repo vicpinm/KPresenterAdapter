@@ -17,7 +17,10 @@ internal fun <T: Any> ViewInfo<T>.createViewHolder(view: View) : ViewHolder<T>? 
             ex.printStackTrace(); null
         }
     } else {
-        object : ViewHolder<T>(view) { override val presenter = null }
+        object : ViewHolder<T>(view) {
+            override val containerView = view
+            override val presenter = null }
+
     }
 }
 
