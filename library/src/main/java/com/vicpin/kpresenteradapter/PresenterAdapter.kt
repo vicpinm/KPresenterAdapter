@@ -230,6 +230,13 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
         }
     }
 
+    fun removeItem(position: Int) {
+        if(position < this.data.size) {
+            this.data.removeAt(position)
+            notifyItemRemoved(getPositionWithHeaders(position))
+        }
+    }
+
     /**
      * Swap two no header items
      * @param from
@@ -312,6 +319,8 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
             notifyItemRemoved(itemCount)
         }
     }
+
+    fun isLoadMoreEnabled() = loadMoreEnabled
 
     override fun getItemId(position: Int): Long {
         if(isLoadMorePosition(position)){

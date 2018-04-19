@@ -8,9 +8,9 @@ import kotlinx.android.extensions.LayoutContainer
 /**
  * Created by Victor on 01/11/2016.
  */
-abstract class ViewHolder<T: Any> : RecyclerView.ViewHolder, LayoutContainer {
+abstract class ViewHolder<in T: Any> : RecyclerView.ViewHolder, LayoutContainer {
 
-    abstract val presenter: ViewHolderPresenter<T, *>?
+    abstract val presenter: ViewHolderPresenter<in T, *>?
     val context: Context
     var customListener: Any? = null
 
@@ -21,7 +21,7 @@ abstract class ViewHolder<T: Any> : RecyclerView.ViewHolder, LayoutContainer {
         context = itemView.context
     }
 
-    fun onBind(data: List<T>, position: Int, deleteListener: (T) -> Unit){
+    fun onBind(data: List<T>, position: Int, deleteListener: (Int) -> Unit){
         setupPresenter(data, deleteListener)
         presenter?.data = data[position]
         presenter?.position = position
@@ -38,7 +38,7 @@ abstract class ViewHolder<T: Any> : RecyclerView.ViewHolder, LayoutContainer {
     }
 
 
-    private fun setupPresenter(data: List<T>, listener: ((T) -> Unit)? = null){
+    private fun setupPresenter(data: List<T>, listener: ((Int) -> Unit)? = null){
         presenter?.setPresenterView(this)
         presenter?.dataCollection = data
         presenter?.setDeleteListener = listener

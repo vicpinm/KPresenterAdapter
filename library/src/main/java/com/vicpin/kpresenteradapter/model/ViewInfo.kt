@@ -7,15 +7,12 @@ import kotlin.reflect.KClass
 /**
  * Created by Victor on 01/11/2016.
  */
-data class ViewInfo<in T: Any>(val viewHolderClass: KClass<out ViewHolder<T>>?, val viewResourceId: Int) {
-    constructor(viewHolderClass: Class<out ViewHolder<T>>?, viewResourceId: Int) : this(if(viewHolderClass != null) viewHolderClass::kotlin.get() else null, viewResourceId)
-}
-
+data class ViewInfo<in T: Any>(val viewHolderClass: KClass<out ViewHolder<T>>?, val viewResourceId: Int)
 
 internal fun <T: Any> ViewInfo<T>.createViewHolder(view: View) : ViewHolder<T>? {
     return if(viewHolderClass != null) {
         try {
-            viewHolderClass!!.java.getConstructor(View::class.java).newInstance(view)
+            viewHolderClass.java.getConstructor(View::class.java).newInstance(view)
         } catch (ex: Exception) {
             ex.printStackTrace(); null
         }
