@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import com.vicpin.kpresenteradapter.extensions.inflate
 import com.vicpin.kpresenteradapter.extensions.refreshData
 import com.vicpin.kpresenteradapter.model.ViewInfo
-import com.vicpin.kpresenteradapter.model.createViewHolder
 import com.vicpin.kpresenteradapter.viewholder.LoadMoreViewHolder
 import java.util.*
 import kotlin.reflect.KClass
@@ -68,7 +67,10 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
     private fun isHeaderType(viewType: Int) = viewType >= HEADER_TYPE && viewType < HEADER_MAX_TYPE
 
     private fun getViewHolder(parent: ViewGroup, viewInfo: ViewInfo<T>) : ViewHolder<T>? {
-        val view = parent.inflate(viewInfo.viewResourceId)
+        val view = viewInfo.view ?: if(viewInfo.viewResourceId != null) {
+            parent.inflate(viewInfo.viewResourceId!!)
+        } else throw IllegalArgumentException("Either viewResourceId or view arguments must be provided to viewInfo class")
+
         val viewHolder = viewInfo.createViewHolder(view)
         viewHolder?.customListener = customListener
         return viewHolder
