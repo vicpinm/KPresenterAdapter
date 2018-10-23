@@ -2,8 +2,10 @@ package com.vicpin.kpresenteradapter
 
 import android.os.Handler
 import android.support.annotation.LayoutRes
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import android.widget.AbsListView
 import com.vicpin.kpresenteradapter.extensions.inflate
 import com.vicpin.kpresenteradapter.extensions.refreshData
 import com.vicpin.kpresenteradapter.model.ViewInfo
@@ -29,6 +31,7 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
     var itemClickListener: ((item: T, view: ViewHolder<T>) -> Unit)? = null
     var itemLongClickListener: ((item: T, view: ViewHolder<T>) -> Unit)? = null
     var loadMoreListener: (() -> Unit)? = null
+    var recyclerView: RecyclerView? = null
 
     /**
      * Sets a custom listener instance. You can call to the listener from your ViewHolder classes with getCustomListener() method.
@@ -177,6 +180,9 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
         this.data = data.toMutableList()
         this.loadMoreInvoked = false
         notifyDataSetChanged()
+        recyclerView?.let {
+            Handler().postDelayed({ notifyScrollStoppedToCurrentViews(it) }, 0)
+        }
         return this
     }
 
@@ -197,6 +203,32 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
     fun getHeadersCount() : Int = headers.size
 
 
+    fun notifyScrollStopped(recycler: RecyclerView) {
+        this.recyclerView = recycler
+        recycler?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING || newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                    //Do nothing
+                } else {
+                    notifyScrollStoppedToCurrentViews(recycler)
+                }
+            }
+        })
+    }
+
+    private fun notifyScrollStoppedToCurrentViews(recycler: RecyclerView) {
+        if(recycler.layoutManager != null) {
+            val firstPosition = (recycler.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+            val lastPosition = (recycler.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+            for (i in firstPosition..lastPosition) {
+                recycler.findViewHolderForAdapterPosition(i)?.let {
+                    (it as? ViewHolder<*>)?.onScrollStopped()
+                }
+            }
+        }
+    }
+
     /**
      * Add data at the end of the current data list and notifies the change
      * @param data items collection to append at the end of the current collection
@@ -216,6 +248,7 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
             else{
                 notifyItemRangeInserted(currentItemCount, dataSize)
             }
+            Handler().postDelayed({ recyclerView?.let { notifyScrollStoppedToCurrentViews(it) }}, 0)
         }
     }
 

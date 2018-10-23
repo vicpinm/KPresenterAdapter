@@ -1,6 +1,7 @@
 package com.vicpin.sample.presenter
 
 
+import android.util.Log
 import com.vicpin.kpresenteradapter.ViewHolderPresenter
 import com.vicpin.sample.model.Country
 
@@ -34,6 +35,10 @@ class CountryPresenter : ViewHolderPresenter<Country, CountryPresenter.View>() {
     fun onDeleteItem() {
         deleteItemFromCollection()
         view?.deleteItem(data)
+    }
+
+    override fun onScrollStoped() {
+        Log.d("scroll stopped","id $presenterId")
     }
 
     interface View {

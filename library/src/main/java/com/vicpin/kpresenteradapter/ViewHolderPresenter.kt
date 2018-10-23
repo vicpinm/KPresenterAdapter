@@ -27,6 +27,10 @@ abstract class ViewHolderPresenter<Data : Any, PresenterView: Any> {
      */
     abstract fun onCreate()
 
+    open fun onScrollStoped() {
+
+    }
+
     fun onPreDestroy(){
         Unsubscriber.unlink(this)
         onDestroy()

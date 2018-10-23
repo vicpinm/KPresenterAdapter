@@ -41,20 +41,18 @@ class ManualBindingFragment : Fragment(), ItemRecycledListener, ItemDeletedListe
         setupAdapter()
         appendListeners()
         setupRecyclerView()
+        loadFirstData()
     }
 
     fun setupAdapter() {
-        val data = CountryRepository.getItemsPage(resources, 0)
         if(isSingleAdapter){
             adapter = SingleLinePresenterAdapter(R.layout.adapter_country_single_line)
         }
         else {
             adapter = SimplePresenterAdapter(CountryView::class, R.layout.adapter_country)
         }
-        adapter.setData(data)
-        adapter.addHeader(R.layout.adapter_header, HeaderView::class)
+        adapter.notifyScrollStopped(list)
         adapter.enableLoadMore { onLoadMore() }
-
 
     }
 
@@ -69,6 +67,12 @@ class ManualBindingFragment : Fragment(), ItemRecycledListener, ItemDeletedListe
     fun setupRecyclerView() {
         list.layoutManager = LinearLayoutManager(activity)
         list.adapter = adapter
+    }
+
+    fun loadFirstData() {
+        val data = CountryRepository.getItemsPage(resources, 0)
+        adapter.setData(data)
+        adapter.addHeader(R.layout.adapter_header, HeaderView::class)
     }
 
     override fun onItemRecycled(presenterId: Int) {

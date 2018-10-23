@@ -44,6 +44,9 @@ abstract class ViewHolder<in T: Any> : RecyclerView.ViewHolder, LayoutContainer 
         presenter?.setDeleteListener = listener
     }
 
+    fun onScrollStopped() {
+        presenter?.onScrollStoped()
+    }
 
     fun onDestroy(){
         presenter?.onPreDestroy()
