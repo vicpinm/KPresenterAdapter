@@ -21,12 +21,12 @@ data class ViewInfo<in T: Any>(val viewHolderClass: KClass<out ViewHolder<T>>? =
         this.view = view
     }
 
-    fun createViewHolder(view: View): ViewHolder<T>? {
+    fun createViewHolder(view: View): ViewHolder<T> {
         return if (viewHolderClass != null) {
             try {
                 viewHolderClass.java.getConstructor(View::class.java).newInstance(view)
             } catch (ex: Exception) {
-                ex.printStackTrace(); null
+                throw ex
             }
         } else {
             object : ViewHolder<T>(view) {

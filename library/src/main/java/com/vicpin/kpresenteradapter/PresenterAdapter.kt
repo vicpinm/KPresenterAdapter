@@ -49,7 +49,7 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
         this.data = data
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<T>? {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<T> {
         if (viewType == LOAD_MORE_TYPE) {
             return LoadMoreViewHolder.getInstance(parent.context)
         } else {
@@ -66,13 +66,13 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
 
     private fun isHeaderType(viewType: Int) = viewType >= HEADER_TYPE && viewType < HEADER_MAX_TYPE
 
-    private fun getViewHolder(parent: ViewGroup, viewInfo: ViewInfo<T>) : ViewHolder<T>? {
+    private fun getViewHolder(parent: ViewGroup, viewInfo: ViewInfo<T>) : ViewHolder<T> {
         val view = viewInfo.view ?: if(viewInfo.viewResourceId != null) {
             parent.inflate(viewInfo.viewResourceId!!)
         } else throw IllegalArgumentException("Either viewResourceId or view arguments must be provided to viewInfo class")
 
         val viewHolder = viewInfo.createViewHolder(view)
-        viewHolder?.customListener = customListener
+        viewHolder.customListener = customListener
         return viewHolder
     }
 

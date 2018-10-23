@@ -30,7 +30,7 @@ class ManualBindingFragment : Fragment(), ItemRecycledListener, ItemDeletedListe
     private lateinit var adapter: PresenterAdapter<Country>
     private var isSingleAdapter = false
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) = container?.inflate(R.layout.fragment_main)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = container?.inflate(R.layout.fragment_main)
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)

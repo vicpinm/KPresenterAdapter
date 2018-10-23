@@ -18,10 +18,10 @@ class SingleLinePresenterAdapter<T: Any>(@LayoutRes val layoutResourceId: Int) :
         override var presenter = SingleLinePresenter<T>()
 
         override fun setText(text: String) {
-            if(itemView?.findViewById(R.id.text) == null){
+            if(itemView.findViewById<View>(R.id.text) == null){
                 throw IllegalArgumentException("View provided for single line adapter should contain a TextView with id: \"text\"")
             }
-            (itemView?.findViewById(R.id.text) as? TextView)?.text = text
+            itemView.findViewById<TextView>(R.id.text)?.text = text
         }
     }
 
