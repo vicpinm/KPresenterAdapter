@@ -2,6 +2,8 @@ package com.vicpin.kpresenteradapter
 
 import android.os.Handler
 import android.support.annotation.LayoutRes
+import android.support.v7.recyclerview.extensions.ListAdapter
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
@@ -9,6 +11,7 @@ import android.widget.AbsListView
 import com.vicpin.kpresenteradapter.extensions.inflate
 import com.vicpin.kpresenteradapter.extensions.refreshData
 import com.vicpin.kpresenteradapter.model.ViewInfo
+import com.vicpin.kpresenteradapter.test.Identifable
 import com.vicpin.kpresenteradapter.viewholder.LoadMoreViewHolder
 import java.util.*
 import kotlin.reflect.KClass
@@ -16,7 +19,7 @@ import kotlin.reflect.KClass
 /**
  * Created by Victor on 01/11/2016.
  */
-abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>() {
+abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffUtilCallback<T>()) {
 
     /**
      * Data collections
@@ -47,6 +50,8 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
     private val LOAD_MORE_TYPE = 99999
     private val HEADER_TYPE = 100000
     private var HEADER_MAX_TYPE = HEADER_TYPE
+    var enableEnimations = false
+
 
     constructor(data: MutableList<T>) : this() {
         this.data = data
@@ -157,7 +162,7 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
         return super.onFailedToRecycleView(holder)
     }
 
-    fun getItem(position: Int) = data[getPositionWithoutHeaders(position)]
+    override fun getItem(position: Int) = data[getPositionWithoutHeaders(position)]
 
 
     fun addHeader(@LayoutRes layout: Int, viewHolderClass: KClass<out ViewHolder<T>>? = null){
@@ -179,7 +184,11 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
     fun setData(data: List<T>) : PresenterAdapter<T>{
         this.data = data.toMutableList()
         this.loadMoreInvoked = false
-        notifyDataSetChanged()
+        if(enableEnimations) {
+            submitList(data)
+        } else {
+            notifyDataSetChanged()
+        }
         recyclerView?.let {
             Handler().postDelayed({ notifyScrollStoppedToCurrentViews(it) }, 0)
         }
@@ -371,4 +380,18 @@ abstract class PresenterAdapter<T : Any>() : RecyclerView.Adapter<ViewHolder<T>>
     fun getData() = data
 
 
+}
+
+class DiffUtilCallback<T: Any>: DiffUtil.ItemCallback<T>() {
+    override fun areItemsTheSame(p0: T, p1: T): Boolean {
+        return if(p0 is Identifable<*> && p1 is Identifable<*>) {
+            (p0 as Identifable<*>).getId() == (p1 as Identifable<*>).getId()
+        } else {
+            false
+        }
+    }
+
+    override fun areContentsTheSame(p0: T, p1: T): Boolean {
+        return p0 == p1
+    }
 }
