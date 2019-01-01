@@ -1,14 +1,14 @@
 package com.vicpin.kpresenteradapter
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import kotlinx.android.extensions.LayoutContainer
 
 /**
  * Created by Victor on 01/11/2016.
  */
-abstract class ViewHolder<in T: Any> : RecyclerView.ViewHolder, LayoutContainer {
+abstract class ViewHolder<in T: Any> : androidx.recyclerview.widget.RecyclerView.ViewHolder, LayoutContainer {
 
     abstract val presenter: ViewHolderPresenter<in T, *>?
     val context: Context
@@ -21,10 +21,9 @@ abstract class ViewHolder<in T: Any> : RecyclerView.ViewHolder, LayoutContainer 
         context = itemView.context
     }
 
-    fun onBind(data: List<T>, position: Int, deleteListener: (Int) -> Unit){
+    fun onBind(data: List<T>, position: Int, deleteListener: () -> Unit){
         setupPresenter(data, deleteListener)
         presenter?.data = data[position]
-        presenter?.position = position
         presenter?.onCreate()
     }
 
@@ -38,10 +37,10 @@ abstract class ViewHolder<in T: Any> : RecyclerView.ViewHolder, LayoutContainer 
     }
 
 
-    private fun setupPresenter(data: List<T>, listener: ((Int) -> Unit)? = null){
+    private fun setupPresenter(data: List<T>, listener: (() -> Unit)? = null){
         presenter?.setPresenterView(this)
         presenter?.dataCollection = data
-        presenter?.setDeleteListener = listener
+        presenter?.onDeleteListener = listener
     }
 
     fun onScrollStopped() {

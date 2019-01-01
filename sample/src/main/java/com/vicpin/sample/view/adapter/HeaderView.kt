@@ -16,6 +16,6 @@ class HeaderView(itemView: View) : ViewHolder<Country>(itemView), HeaderPresente
 
 
     override fun setNumItems(numItems: Int) {
-        text.text = context.getString(R.string.header, numItems)
+        headerText.text = context.getString(R.string.header, numItems)
     }
 }

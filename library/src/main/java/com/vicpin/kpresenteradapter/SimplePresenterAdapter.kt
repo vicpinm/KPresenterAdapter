@@ -1,6 +1,6 @@
 package com.vicpin.kpresenteradapter
 
-import android.support.annotation.LayoutRes
+import androidx.annotation.LayoutRes
 import com.vicpin.kpresenteradapter.model.ViewInfo
 import kotlin.reflect.KClass
 

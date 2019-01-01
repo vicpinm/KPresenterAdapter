@@ -1,7 +1,7 @@
 package com.vicpin.sample.view.activity
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import com.vicpin.sample.R
@@ -12,7 +12,6 @@ class ManualBindingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_main)
         supportFragmentManager.beginTransaction().replace(android.R.id.content, ManualBindingFragment()).commit()
     }
 

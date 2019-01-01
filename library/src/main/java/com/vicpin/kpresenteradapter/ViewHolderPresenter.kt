@@ -14,9 +14,8 @@ abstract class ViewHolderPresenter<Data : Any, PresenterView: Any> {
 
     var view: PresenterView? = null
     lateinit var data: Data
-    var position = 0
     lateinit var dataCollection: List<Data>
-    var setDeleteListener: ((Int) -> Unit)? = null
+    var onDeleteListener: (() -> Unit)? = null
     val presenterId: Int by lazy { presenterIdsGenerator.andIncrement }
 
     fun setPresenterView(view: Any){
@@ -42,7 +41,7 @@ abstract class ViewHolderPresenter<Data : Any, PresenterView: Any> {
     open fun onDestroy(){}
 
     fun deleteItemFromCollection() {
-        setDeleteListener?.invoke(position)
+        onDeleteListener?.invoke()
     }
 
 }

@@ -2,8 +2,7 @@ package com.vicpin.sample.view.fragment
 
 import android.os.Bundle
 import android.os.Handler
-import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.vicpin.kpresenteradapter.PresenterAdapter
@@ -11,9 +10,12 @@ import com.vicpin.kpresenteradapter.SimplePresenterAdapter
 import com.vicpin.kpresenteradapter.SingleLinePresenterAdapter
 import com.vicpin.kpresenteradapter.extensions.inflate
 import com.vicpin.sample.R
+import com.vicpin.sample.di.Injector
+import com.vicpin.sample.extensions.finishIdlingResource
 import com.vicpin.sample.extensions.showToast
+import com.vicpin.sample.extensions.startIdlingResource
 import com.vicpin.sample.model.Country
-import com.vicpin.sample.model.CountryRepository
+import com.vicpin.sample.model.IRepository
 import com.vicpin.sample.view.adapter.CountryView
 import com.vicpin.sample.view.adapter.HeaderView
 import com.vicpin.sample.view.interfaces.ItemDeletedListener
@@ -29,48 +31,50 @@ class ManualBindingFragment : Fragment(), ItemRecycledListener, ItemDeletedListe
     private var currentPage: Int = 0
     private lateinit var adapter: PresenterAdapter<Country>
     private var isSingleAdapter = false
+    private lateinit var repository: IRepository<Country>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = container?.inflate(R.layout.fragment_main)
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        this.repository = Injector.get().getCountryRepository()
         initView()
     }
 
-    fun initView(){
+    private fun initView(){
         setupAdapter()
         appendListeners()
         setupRecyclerView()
         loadFirstData()
     }
 
-    fun setupAdapter() {
+    private fun setupAdapter() {
         if(isSingleAdapter){
             adapter = SingleLinePresenterAdapter(R.layout.adapter_country_single_line)
         }
         else {
             adapter = SimplePresenterAdapter(CountryView::class, R.layout.adapter_country)
         }
-        adapter.notifyScrollStopped(list)
+        adapter.notifyScrollStopped(recycler)
         adapter.enableLoadMore { onLoadMore() }
 
     }
 
-    fun appendListeners() {
+    private fun appendListeners() {
         adapter.apply {
-            itemClickListener = { item, view -> showToast("Country clicked: " + item.name) }
+            itemClickListener = { item, view -> showToast(getString(R.string.toast_message,item.name)) }
             itemLongClickListener = { item, view -> showToast("Country long pressed: " + item.name) }
             customListener = this@ManualBindingFragment
         }
     }
 
-    fun setupRecyclerView() {
-        list.layoutManager = LinearLayoutManager(activity)
-        list.adapter = adapter
+    private fun setupRecyclerView() {
+        recycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(activity)
+        recycler.adapter = adapter
     }
 
-    fun loadFirstData() {
-        val data = CountryRepository.getItemsPage(resources, 0)
+    private fun loadFirstData() {
+        val data = repository.getItemsPage(0)
         adapter.setData(data)
         adapter.addHeader(R.layout.adapter_header, HeaderView::class)
     }
@@ -83,15 +87,17 @@ class ManualBindingFragment : Fragment(), ItemRecycledListener, ItemDeletedListe
     /**
      * Pagination listener. Simulates a 1500ms load delay.
      */
-    fun onLoadMore() {
+    private fun onLoadMore() {
+        startIdlingResource()
         Handler().postDelayed({
             currentPage++
-            val newData = CountryRepository.getItemsPage(resources, currentPage)
-            if (newData.size > 0) {
+            val newData = repository.getItemsPage(currentPage)
+            if (newData.isNotEmpty()) {
                 adapter.addData(newData)
             } else {
                 adapter.disableLoadMore()
             }
+            finishIdlingResource()
         }, 1500)
 
     }
@@ -105,3 +111,4 @@ class ManualBindingFragment : Fragment(), ItemRecycledListener, ItemDeletedListe
         initView()
     }
 }
+

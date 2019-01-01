@@ -1,11 +1,11 @@
 package com.vicpin.kpresenteradapter
 
 import android.os.Handler
-import android.support.annotation.LayoutRes
-import android.support.v7.recyclerview.extensions.ListAdapter
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.annotation.LayoutRes
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.ViewGroup
 import android.widget.AbsListView
 import com.vicpin.kpresenteradapter.extensions.inflate
@@ -34,7 +34,7 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
     var itemClickListener: ((item: T, view: ViewHolder<T>) -> Unit)? = null
     var itemLongClickListener: ((item: T, view: ViewHolder<T>) -> Unit)? = null
     var loadMoreListener: (() -> Unit)? = null
-    var recyclerView: RecyclerView? = null
+    var recyclerView: androidx.recyclerview.widget.RecyclerView? = null
 
     /**
      * Sets a custom listener instance. You can call to the listener from your ViewHolder classes with getCustomListener() method.
@@ -117,7 +117,7 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
     override fun onBindViewHolder(holder: ViewHolder<T>, position: Int) {
         if(isNormalPosition(position)) {
             holder.onBind(data, getPositionWithoutHeaders(position), deleteListener = {
-                removeItem(it)
+                removeItem(getPositionWithoutHeaders(holder.adapterPosition))
             })
             appendListeners(holder)
         }
@@ -201,7 +201,7 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
      * @param recyclerView RecyclerView instance
      * @return PresenterAdapter called instance
      */
-    fun setDataKeepScroll(data: MutableList<T>, recyclerView: RecyclerView){
+    fun setDataKeepScroll(data: MutableList<T>, recyclerView: androidx.recyclerview.widget.RecyclerView){
         this.data = data
         this.loadMoreInvoked = false
         refreshData(recyclerView)
@@ -212,10 +212,10 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
     fun getHeadersCount() : Int = headers.size
 
 
-    fun notifyScrollStopped(recycler: RecyclerView) {
+    fun notifyScrollStopped(recycler: androidx.recyclerview.widget.RecyclerView) {
         this.recyclerView = recycler
-        recycler?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+        recycler?.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: androidx.recyclerview.widget.RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 if (newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING || newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
                     //Do nothing
@@ -226,10 +226,10 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
         })
     }
 
-    private fun notifyScrollStoppedToCurrentViews(recycler: RecyclerView) {
+    private fun notifyScrollStoppedToCurrentViews(recycler: androidx.recyclerview.widget.RecyclerView) {
         if(recycler.layoutManager != null) {
-            val firstPosition = (recycler.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-            val lastPosition = (recycler.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+            val firstPosition = (recycler.layoutManager as androidx.recyclerview.widget.LinearLayoutManager).findFirstVisibleItemPosition()
+            val lastPosition = (recycler.layoutManager as androidx.recyclerview.widget.LinearLayoutManager).findLastVisibleItemPosition()
             for (i in firstPosition..lastPosition) {
                 recycler.findViewHolderForAdapterPosition(i)?.let {
                     (it as? ViewHolder<*>)?.onScrollStopped()

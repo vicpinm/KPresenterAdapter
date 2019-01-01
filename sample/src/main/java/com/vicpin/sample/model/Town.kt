@@ -9,9 +9,10 @@ import com.vicpin.sample.R
  * Created by Victor on 25/06/2016.
  */
 @AutoViewHolder
-data class Town(@BindText(id = R.id.name, isHtml = true, template = R.string.townName)
-                val name: String,
-                @BindImage(id = R.id.img)
-                val url: String) {
-    
-}
+data class Town(
+        @BindText(id = R.id.name, isHtml = true)
+        val name: String,
+
+        @BindImage(id = R.id.img)
+        val url: String
+)

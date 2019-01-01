@@ -1,8 +1,8 @@
 package com.vicpin.kpresenteradapter.extensions
 
 import android.content.Context
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,18 +20,18 @@ fun ViewGroup.inflate(layout: Int, attachToParent: Boolean = false): View {
     return LayoutInflater.from(context).inflate(layout, this, attachToParent)
 }
 
-fun RecyclerView.getCurrentScroll(): Pair<Int, Int> {
-    val currentPosition = (layoutManager as? LinearLayoutManager)?.findFirstVisibleItemPosition()
+fun androidx.recyclerview.widget.RecyclerView.getCurrentScroll(): Pair<Int, Int> {
+    val currentPosition = (layoutManager as? androidx.recyclerview.widget.LinearLayoutManager)?.findFirstVisibleItemPosition()
     val top = if (getChildAt(0) == null) 0 else getChildAt(0).top - paddingTop
     return Pair(currentPosition ?: 0, top)
 }
 
-fun RecyclerView.applyScroll(position: Int, top: Int) {
-    (getLayoutManager() as? LinearLayoutManager)?.scrollToPositionWithOffset(position, top)
+fun androidx.recyclerview.widget.RecyclerView.applyScroll(position: Int, top: Int) {
+    (getLayoutManager() as? androidx.recyclerview.widget.LinearLayoutManager)?.scrollToPositionWithOffset(position, top)
 }
 
 
-fun <T : Any> RecyclerView.Adapter<out ViewHolder<T>>.refreshData(recyclerView: RecyclerView) {
+fun <T : Any> androidx.recyclerview.widget.RecyclerView.Adapter<out ViewHolder<T>>.refreshData(recyclerView: androidx.recyclerview.widget.RecyclerView) {
     var (position, top) = recyclerView.getCurrentScroll()
     notifyDataSetChanged()
     recyclerView.applyScroll(position, top)
@@ -41,11 +41,11 @@ fun <T : Any> RecyclerView.Adapter<out ViewHolder<T>>.refreshData(recyclerView: 
  * Reload current views showing on the screen
  * @param recyclerView
  */
-fun <T : Any> RecyclerView.Adapter<out ViewHolder<T>>.refreshViews(recyclerView: RecyclerView) {
+fun <T : Any> androidx.recyclerview.widget.RecyclerView.Adapter<out ViewHolder<T>>.refreshViews(recyclerView: androidx.recyclerview.widget.RecyclerView) {
 
     if(recyclerView.layoutManager != null) {
-        val firstPosition = (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-        val lastPosition = (recyclerView.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+        val firstPosition = (recyclerView.layoutManager as androidx.recyclerview.widget.LinearLayoutManager).findFirstVisibleItemPosition()
+        val lastPosition = (recyclerView.layoutManager as androidx.recyclerview.widget.LinearLayoutManager).findLastVisibleItemPosition()
         for (i in firstPosition..lastPosition) {
             notifyItemChanged(i)
         }

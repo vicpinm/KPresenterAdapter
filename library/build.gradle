@@ -16,7 +16,7 @@ apply from: 'maven-push.gradle'
 
 android {
     compileSdkVersion 28
-    buildToolsVersion '28.0.2'
+    buildToolsVersion rootProject.buildToolsVersion
 
     androidExtensions {
         experimental = true
@@ -42,8 +42,8 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation "com.github.vicpinm:autosubscription:1.0.2"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     api "com.github.vicpinm:kpresenteradapter-annotations:2.0.0"
