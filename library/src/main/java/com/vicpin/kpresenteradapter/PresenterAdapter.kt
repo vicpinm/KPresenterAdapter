@@ -13,6 +13,7 @@ import com.vicpin.kpresenteradapter.extensions.refreshData
 import com.vicpin.kpresenteradapter.model.ViewInfo
 import com.vicpin.kpresenteradapter.test.Identifable
 import com.vicpin.kpresenteradapter.viewholder.LoadMoreViewHolder
+import java.lang.IndexOutOfBoundsException
 import java.util.*
 import kotlin.reflect.KClass
 
@@ -47,18 +48,20 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
      */
     private var loadMoreEnabled: Boolean = false
     private var loadMoreInvoked: Boolean = false
-    private val LOAD_MORE_TYPE = 99999
-    private val HEADER_TYPE = 100000
     private var HEADER_MAX_TYPE = HEADER_TYPE
     var enableEnimations = false
 
+    companion object {
+        const val LOAD_MORE_TYPE = Int.MAX_VALUE
+        const val HEADER_TYPE = Int.MIN_VALUE
+    }
 
     constructor(data: MutableList<T>) : this() {
         this.data = data
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<T> {
-        if (viewType == LOAD_MORE_TYPE) {
+        if (viewType == Companion.LOAD_MORE_TYPE) {
             return LoadMoreViewHolder.getInstance(parent.context)
         } else {
             var viewInfo = getViewInfoForType(viewType)
@@ -67,7 +70,7 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
     }
 
 
-    fun getViewInfoForType(viewType: Int) =
+    private fun getViewInfoForType(viewType: Int) =
             if (isHeaderType(viewType)) headers[viewType - HEADER_TYPE]
             else registeredViewInfo[viewType]
 
@@ -266,6 +269,10 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
         notifyDataSetChanged()
     }
 
+
+    /**
+     * Remove item object from data collection
+     */
     fun removeItem(item: T){
         if(this.data.contains(item)){
             val pos = this.data.indexOf(item)
@@ -274,18 +281,22 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
         }
     }
 
+    /**
+     * Remove item position from data collection. Position argument does no take into account headers.
+     */
     fun removeItem(position: Int) {
-        if(position < this.data.size) {
+        if(position >= 0 && position < this.data.size) {
             this.data.removeAt(position)
             notifyItemRemoved(getPositionWithHeaders(position))
         }
     }
 
     /**
-     * Swap two no header items
-     * @param from
-     * *
-     * @param to
+     * Swap two items. First item has position 0. If position corresponds with header position, exception is thrown.
+     * @param from: absolute position in collection, taking into account headers
+     * @param to:  absolute position in collection, taking into account headers
+     *
+     * @return Unit, or IllegalArgumentException if either from or to arguments are header positions.
      */
     fun swapItems(from: Int, to: Int) {
         var from = from
@@ -298,7 +309,7 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
         to -= getHeadersCount()
 
         if (from >= data.size || to >= data.size) {
-            throw IllegalArgumentException("Cannot swap items, data size is " + data.size)
+            throw IndexOutOfBoundsException("Cannot swap items, data size is " + data.size)
         }
 
         if (from == to) {
@@ -313,9 +324,10 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
 
     /**
      * Move one item to another position, updating intermediates positions
-     * @param from
-     * *
-     * @param to
+     * @param from: absolute position in collection, taking into account headers
+     * @param to:  absolute position in collection, taking into account headers
+     *
+     * @return Unit, or IllegalArgumentException if either from or to arguments are header positions.
      */
     fun moveItem(from: Int, to: Int) {
         var from = from
@@ -328,7 +340,7 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
         to -= getHeadersCount()
 
         if (from >= data.size || to >= data.size) {
-            throw IllegalArgumentException("Cannot move item, data size is " + data.size)
+            throw IndexOutOfBoundsException("Cannot move item, data size is " + data.size)
         }
 
         if (from == to) {
@@ -368,7 +380,7 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
 
     override fun getItemId(position: Int): Long {
         if(isLoadMorePosition(position)){
-            return LOAD_MORE_TYPE.toLong()
+            return Companion.LOAD_MORE_TYPE.toLong()
         }
         else if (hasStableIds()) {
             return if (position < getHeadersCount()) headers[position].hashCode().toLong() else getItem(position).hashCode().toLong()
@@ -378,6 +390,8 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
     }
 
     fun getData() = data
+
+
 
 
 }

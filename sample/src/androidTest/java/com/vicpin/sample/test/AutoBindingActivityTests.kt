@@ -84,7 +84,7 @@ class AutoBindingActivityTests {
 
         //When: activity starts and scroll to second page
         launchActivity<AutoBindingActivity>()
-        onViewId(R.id.recycler).scrollTo(TEST_PAGE_SIZE + 1)
+        onViewId(R.id.recycler).scrollTo(TEST_PAGE_SIZE)
 
         //Then: list has first page loaded
         onViewId(R.id.recycler).check(matches(hasAdapterSize(TEST_PAGE_SIZE * 2)))
@@ -116,7 +116,7 @@ class AutoBindingActivityTests {
 
         //When: activity starts and scrolls to bottom
         launchActivity<AutoBindingActivity>()
-        onViewId(R.id.recycler).scrollTo(TEST_PAGE_SIZE + 1)
+        onViewId(R.id.recycler).scrollTo(TEST_PAGE_SIZE)
 
         //Then: at first, progress is displayed
         onViewId(R.id.progressBar).check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
@@ -157,45 +157,11 @@ class AutoBindingActivityTests {
         //When: activity starts and we scroll to last page
         launchActivity<AutoBindingActivity>()
         for(i in 1..5) {
-            onViewId(R.id.recycler).scrollTo((TEST_PAGE_SIZE * i) + 1)
+            onViewId(R.id.recycler).scrollTo(TEST_PAGE_SIZE * i)
         }
 
         //Then: after last page is loaded, the amount of items loaded are TEST_PAGE_SIZE * 5
         onViewId(R.id.recycler).check(matches(hasAdapterSize(items)))
-    }
-
-    @Test
-    fun when_itemDeleted_then_itemIsHidden() {
-        //Given: some items over page limit
-        val items = 2
-        initRepositoryWithTowns(items)
-
-        //When: activity starts and delete first item
-        launchActivity<AutoBindingActivity>()
-        onView(allOf(withId(R.id.deleteButton), hasSibling(withText("$TOWN_NAME_PREFIX 1")))).perform(click())
-
-        //Then: items size are decremented
-        onViewId(R.id.recycler).check(matches(hasAdapterSize(items - 1)))
-
-        //Check correct item is hidden
-        onView(allOf(withId(R.id.deleteButton), hasSibling(withText("$TOWN_NAME_PREFIX 1")))).check(isNotDisplayed())
-    }
-
-
-    @Test
-    fun when_allItemsAreDeleted_then_listHasNoItems() {
-        //Given: some items over page limit
-        val items = TEST_PAGE_SIZE * 2
-        initRepositoryWithTowns(items)
-
-        //When: activity starts and delete first item
-        launchActivity<AutoBindingActivity>()
-        testRepository.items.forEachIndexed { index, town ->
-            onView(allOf(withId(R.id.deleteButton), hasSibling(withText(town.name)))).perform(click())
-        }
-
-        //Then: items size are decremented
-        onViewId(R.id.recycler).check(matches(hasAdapterSize(0)))
     }
 
     @Test
@@ -207,7 +173,7 @@ class AutoBindingActivityTests {
 
         //When: activity starts and item is clicked
         launchActivity<AutoBindingActivity>()
-        onViewId(R.id.recycler).perform(actionOnItemAtPosition<RecyclerView.ViewHolder>(positionClicked + 1, click()))
+        onViewId(R.id.recycler).perform(actionOnItemAtPosition<RecyclerView.ViewHolder>(positionClicked, click()))
 
         //Then: toast is showed
         val toastText = getResources().getString(R.string.toast_message, testRepository.items[positionClicked].name)
