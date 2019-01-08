@@ -6,7 +6,7 @@ import com.vicpin.kpresenteradapter.ViewHolder
 import com.vicpin.sample.di.Injector
 
 import com.vicpin.sample.model.Country
-import com.vicpin.sample.presenter.CountryPresenter
+import com.vicpin.sample.view.presenter.CountryPresenter
 import com.vicpin.sample.view.interfaces.ItemDeletedListener
 import com.vicpin.sample.view.interfaces.ItemRecycledListener
 import kotlinx.android.synthetic.main.adapter_country.*

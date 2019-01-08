@@ -22,6 +22,10 @@ public class MenuActivity : AppCompatActivity() {
         manualBinding.setOnClickListener {
             startActivity(Intent(this, ManualBindingActivity::class.java))
         }
+
+        multiTypeBinding.setOnClickListener {
+            startActivity(Intent(this, MultiBindingActivity::class.java))
+        }
         
     }
 }

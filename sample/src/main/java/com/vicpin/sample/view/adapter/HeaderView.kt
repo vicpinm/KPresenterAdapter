@@ -4,7 +4,7 @@ import android.view.View
 import com.vicpin.kpresenteradapter.ViewHolder
 import com.vicpin.sample.R
 import com.vicpin.sample.model.Country
-import com.vicpin.sample.presenter.HeaderPresenter
+import com.vicpin.sample.view.presenter.HeaderPresenter
 import kotlinx.android.synthetic.main.adapter_header.*
 
 /**

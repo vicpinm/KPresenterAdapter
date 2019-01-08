@@ -3,6 +3,7 @@
     <string name="header">Header - Total items: %d</string>
     <string name="townName">Nombre: %s</string>
     <string name="toast_message">Country clicked: %s</string>
+    <string name="item_toast_message">Item clicked: %s</string>
 
     <string-array name="countries">
         <item>Afghanistan</item>

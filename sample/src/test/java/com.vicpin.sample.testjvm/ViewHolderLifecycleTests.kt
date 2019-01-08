@@ -10,7 +10,7 @@ import com.vicpin.sample.R
 import com.vicpin.sample.di.Injector
 import com.vicpin.sample.model.Country
 import com.vicpin.sample.model.IRepository
-import com.vicpin.sample.presenter.CountryPresenter
+import com.vicpin.sample.view.presenter.CountryPresenter
 import com.vicpin.sample.view.activity.ManualBindingActivity
 import org.junit.Before
 import org.junit.Test

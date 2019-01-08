@@ -1,9 +1,9 @@
-package com.vicpin.sample.model
+package com.vicpin.sample.data
 
 import android.content.Context
-import android.content.res.Resources
 import com.vicpin.sample.R
-import java.util.*
+import com.vicpin.sample.model.IRepository
+import com.vicpin.sample.model.Town
 
 /**
  * Created by Victor on 25/06/2016.

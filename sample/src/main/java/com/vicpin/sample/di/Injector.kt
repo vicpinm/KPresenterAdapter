@@ -1,8 +1,10 @@
 package com.vicpin.sample.di
 
 import android.content.Context
+import com.vicpin.sample.data.CountryRepository
+import com.vicpin.sample.data.TownRepository
 import com.vicpin.sample.model.*
-import com.vicpin.sample.presenter.CountryPresenter
+import com.vicpin.sample.view.presenter.CountryPresenter
 
 class Injector private constructor(val context: Context) {
 

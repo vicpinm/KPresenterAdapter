@@ -7,7 +7,7 @@ import kotlin.reflect.KClass
 /**
  * Created by Victor on 01/11/2016.
  */
-data class ViewInfo<in T: Any>(val viewHolderClass: KClass<out ViewHolder<T>>? = null) {
+data class ViewInfo<out T: Any>(val viewHolderClass: KClass<out ViewHolder<*>>? = null) {
 
     var viewResourceId: Int? = null
     var view: View? = null
@@ -21,7 +21,7 @@ data class ViewInfo<in T: Any>(val viewHolderClass: KClass<out ViewHolder<T>>? =
         this.view = view
     }
 
-    fun createViewHolder(view: View): ViewHolder<T> {
+    fun createViewHolder(view: View): ViewHolder<*> {
         return if (viewHolderClass != null) {
             try {
                 viewHolderClass.java.getConstructor(View::class.java).newInstance(view)

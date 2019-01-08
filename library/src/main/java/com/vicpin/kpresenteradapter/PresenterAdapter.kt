@@ -84,7 +84,7 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
 
         val viewHolder = viewInfo.createViewHolder(view)
         viewHolder.customListener = customListener
-        return viewHolder
+        return viewHolder as ViewHolder<T>
     }
 
     override fun getItemViewType(position: Int): Int {

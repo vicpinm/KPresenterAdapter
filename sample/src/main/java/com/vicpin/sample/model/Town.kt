@@ -11,8 +11,8 @@ import com.vicpin.sample.R
 @AutoViewHolder
 data class Town(
         @BindText(id = R.id.name, isHtml = true)
-        val name: String,
+        override val name: String,
 
         @BindImage(id = R.id.img)
         val url: String
-)
+) : NamedItem

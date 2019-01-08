@@ -1,4 +1,4 @@
-package com.vicpin.sample.presenter
+package com.vicpin.sample.view.presenter
 
 
 import android.util.Log

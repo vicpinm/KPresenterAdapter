@@ -21,6 +21,9 @@
         <activity android:name=".view.activity.ManualBindingActivity">
         </activity>
         <activity android:name=".view.activity.AutoBindingActivity"></activity>
+
+        <activity android:name=".view.activity.MultiBindingActivity"></activity>
+
     </application>
 
 </manifest>

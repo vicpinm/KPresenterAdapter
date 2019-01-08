@@ -1,7 +1,9 @@
-package com.vicpin.sample.model
+package com.vicpin.sample.data
 
 import android.content.Context
 import com.vicpin.sample.R
+import com.vicpin.sample.model.Country
+import com.vicpin.sample.model.IRepository
 
 /**
  * Created by Victor on 25/06/2016.
