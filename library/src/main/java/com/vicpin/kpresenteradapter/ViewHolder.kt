@@ -27,13 +27,22 @@ abstract class ViewHolder<in T: Any> : androidx.recyclerview.widget.RecyclerView
         presenter?.onCreate()
     }
 
+
     /**
      * Called when adapter's onBindViewHolder is executed for a header row type
-     * Initializes presenter binding view but no data item
+     * Initializes presenter binding view without data item
      */
     fun onBindHeader(data: List<T>) {
         setupPresenter(data)
         presenter?.onCreate()
+    }
+
+    fun onAttached() {
+        presenter?.onAttached()
+    }
+
+    fun onDetached() {
+        presenter?.onDetached()
     }
 
 

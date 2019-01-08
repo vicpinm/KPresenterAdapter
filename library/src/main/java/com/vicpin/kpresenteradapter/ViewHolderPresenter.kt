@@ -22,9 +22,23 @@ abstract class ViewHolderPresenter<Data : Any, PresenterView: Any> {
         this.view = view as? PresenterView
     }
     /**
-     * Called when the view becomes visible in the adapter
+     * Called when this viewholder is binded to the current data item
      */
     abstract fun onCreate()
+
+    /**
+     * Called when the view becomes visible to user
+     */
+    open fun onAttached() {
+
+    }
+
+    /**
+     * Called when the view is out of the screen
+     */
+    open fun onDetached() {
+
+    }
 
     open fun onScrollStoped() {
 
@@ -36,12 +50,14 @@ abstract class ViewHolderPresenter<Data : Any, PresenterView: Any> {
     }
 
     /**
-     * Called when the view is recycled and is no more visible in the adapter
+     * Called when the view is recycled and is ready to be reused
      */
     open fun onDestroy(){}
 
     fun deleteItemFromCollection() {
         onDeleteListener?.invoke()
     }
+
+
 
 }

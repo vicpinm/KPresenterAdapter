@@ -263,6 +263,7 @@ class AdapterTests {
         }
     }
 
+
     private fun givenASimplePresenterWith(config: AdapterConfig): PresenterAdapter<String> {
         val mockStringViewholder = mock(ViewHolder::class.java) as ViewHolder<String>
         val presenter = SimplePresenterAdapter(mockStringViewholder::class, 0)

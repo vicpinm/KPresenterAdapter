@@ -61,7 +61,7 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<T> {
-        if (viewType == Companion.LOAD_MORE_TYPE) {
+        if (viewType == LOAD_MORE_TYPE) {
             return LoadMoreViewHolder.getInstance(parent.context)
         } else {
             var viewInfo = getViewInfoForType(viewType)
@@ -118,18 +118,24 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
     private fun isNormalPosition(position: Int) = !isLoadMorePosition(position) && !isHeaderPosition(position)
 
     override fun onBindViewHolder(holder: ViewHolder<T>, position: Int) {
-        if(isNormalPosition(position)) {
-            holder.onBind(data, getPositionWithoutHeaders(position), deleteListener = {
-                removeItem(getPositionWithoutHeaders(holder.adapterPosition))
-            })
-            appendListeners(holder)
+        when {
+            isNormalPosition(position) -> {
+                holder.onBind(data, getPositionWithoutHeaders(position), deleteListener = {
+                    removeItem(getPositionWithoutHeaders(holder.adapterPosition))
+                })
+                appendListeners(holder)
+            }
+            isHeaderPosition(position) -> holder.onBindHeader(data)
+            isLoadMorePosition(position) -> notifyLoadMoreReached()
         }
-        else if(isHeaderPosition(position)){
-            holder.onBindHeader(data)
-        }
-        else if(isLoadMorePosition(position)){
-            notifyLoadMoreReached()
-        }
+    }
+
+    override fun onViewAttachedToWindow(holder: ViewHolder<T>) {
+        holder.onAttached()
+    }
+
+    override fun onViewDetachedFromWindow(holder: ViewHolder<T>) {
+        holder.onDetached()
     }
 
     fun getPositionWithoutHeaders(position: Int) = position - headers.size

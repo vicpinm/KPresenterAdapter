@@ -2,12 +2,16 @@ package com.vicpin.sample.di
 
 import android.content.Context
 import com.vicpin.sample.model.*
+import com.vicpin.sample.presenter.CountryPresenter
 
 class Injector private constructor(val context: Context) {
 
     companion object {
         private lateinit var instance: Injector
         fun get() = instance
+        fun set(instance: Injector) {
+            Companion.instance = instance
+        }
         fun init(context: Context) {
             instance = Injector(context)
         }
@@ -42,6 +46,7 @@ class Injector private constructor(val context: Context) {
         this.townRepository = repository
     }
 
+    fun getCountryPresenter() = CountryPresenter()
 
 
 }

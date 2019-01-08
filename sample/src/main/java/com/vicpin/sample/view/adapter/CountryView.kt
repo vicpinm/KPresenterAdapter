@@ -3,6 +3,7 @@ package com.vicpin.sample.view.adapter
 import android.view.View
 
 import com.vicpin.kpresenteradapter.ViewHolder
+import com.vicpin.sample.di.Injector
 
 import com.vicpin.sample.model.Country
 import com.vicpin.sample.presenter.CountryPresenter
@@ -15,7 +16,7 @@ import kotlinx.android.synthetic.main.adapter_country.*
  */
 class CountryView(itemView: View) : ViewHolder<Country>(itemView), CountryPresenter.View {
 
-    override var presenter = CountryPresenter()
+    override var presenter = Injector.get().getCountryPresenter()
 
     init {
         deleteButton.setOnClickListener { presenter.onDeleteItem() }
