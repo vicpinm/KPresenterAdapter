@@ -55,26 +55,41 @@ As you can see, this class is very similar to a fragment or activity class. It c
 
 ### Presenter class
 Class responsible for implementing the presenter layer in MPV pattern, equivalent to any other presenter. It inherits from ViewHolderPresenter<Model, View> class. 
-This class is generic and you need to indicate two types, your adapter model class (<Country> in this sample) and your presenter view interface class. 
-You have to override onCreate method to setup your view. Also, you can override onDestroy method if you need to implement any destroy logic for your view.
-Inside your presenter class, you have access to getData() method, in order to get the current data instance for the view, obtained from the adapter data collection.
-Also, inside your presenter class, you have access to getView() method, in order to interact with your view class.
+This class is generic and you need to indicate two types, your adapter model class (<Country> in this sample) and your presenter view interface class. So following our sample, the declaration of our CountryPresenter class will like like:
+ 
+    class CountryPresenter : ViewHolderPresenter<Country, CountryPresenter.View>() { ... }
+    
+ViewHolderPresenter receives the following lifecycle events:
+ 
+ <p align="center">
+  <img src ="/lifecycle.png" />
+</p>
 
-    public class CountryPresenter extends ViewHolderPresenter<Country, CountryPresenter.View> {
 
-        @Override
-        public void onCreate() {
-            setCountryName();
-        }
+onCreate method is mandatory and the rest is optional. 
 
-        public void setCountryName(){
-            getView().setCountryName(getData().getName());
-        }
+Inside your presenter class, you have access to a "data" parameter, in order to get the data instance to be bound to that adapter position. Also, you have access to a "dataCollection" parameter if you need to perform other operations with your entire collection. 
 
-        public interface View {
-             void setCountryName(String s);
-        }
+Last, inside your presenter class, you have access to the "view" parameter, in order to interact with your view class as you normally do in a presenter class. Below you can see a simplified version of the CountryPresenter class:
+
+```
+class CountryPresenter : ViewHolderPresenter<Country, CountryPresenter.View>() {
+
+    override fun onCreate() {
+        view?.setCountryName(data.name)
+        view?.setImage(data.imageResourceId)
     }
+
+    fun onDeleteItem() {
+        deleteItemFromCollection()
+    }
+
+    interface View {
+        fun setCountryName(name: String)
+        fun setImage(resourceId: Int)
+    }
+}
+```
 
 ### Multiple view type adapter
 
