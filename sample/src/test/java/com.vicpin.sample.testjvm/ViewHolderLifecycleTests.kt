@@ -46,7 +46,7 @@ class ViewHolderLifecycleTests {
 
             //Then: oncreate and onattached methods are called one time per item
             verify(countryPresenter, times(itemsSize)).onCreate()
-            verify(countryPresenter, times(itemsSize)).onAttached()
+            verify(countryPresenter, times(itemsSize)).onAttach()
         }
     }
 
@@ -66,17 +66,17 @@ class ViewHolderLifecycleTests {
 
             //Then: verify that onCreate and onAttached is called for each item
             verify(countryPresenter, times(totalVisibleItems)).onCreate()
-            verify(countryPresenter, times(totalVisibleItems)).onAttached()
+            verify(countryPresenter, times(totalVisibleItems)).onAttach()
 
             //After: scroll to second group of visible items
             onViewId(R.id.recycler).scrollTo(totalVisibleItems * 2)
 
             //Then: verify that onCreate and onAttached is called for each item again
             verify(countryPresenter, times(totalVisibleItems * 2)).onCreate()
-            verify(countryPresenter, times(totalVisibleItems * 2)).onAttached()
+            verify(countryPresenter, times(totalVisibleItems * 2)).onAttach()
 
             //Verify that onDetached is called for no visible items
-            verify(countryPresenter, times(totalVisibleItems)).onDetached()
+            verify(countryPresenter, times(totalVisibleItems)).onDetach()
             
             //Verify that onDestroy is called at leas once (we cannot assure how many times is going to be called)
             verify(countryPresenter, atLeastOnce()).onDestroy()
