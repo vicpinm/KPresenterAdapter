@@ -5,6 +5,7 @@ import android.os.Handler
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.vicpin.kpresenteradapter.PresenterAdapter
 import com.vicpin.kpresenteradapter.SimplePresenterAdapter
 import com.vicpin.kpresenteradapter.SingleLinePresenterAdapter
@@ -69,7 +70,7 @@ class ManualBindingFragment : Fragment(), ItemRecycledListener, ItemDeletedListe
     }
 
     private fun setupRecyclerView() {
-        recycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(activity)
+        recycler.layoutManager = LinearLayoutManager(activity)
         recycler.adapter = adapter
     }
 

@@ -29,14 +29,14 @@ abstract class ViewHolderPresenter<Data : Any, PresenterView: Any> {
     /**
      * Called when the view becomes visible to user
      */
-    open fun onAttached() {
+    open fun onAttach() {
 
     }
 
     /**
      * Called when the view is out of the screen
      */
-    open fun onDetached() {
+    open fun onDetach() {
 
     }
 
