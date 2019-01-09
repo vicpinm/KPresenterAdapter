@@ -59,7 +59,7 @@ This class is generic and you need to indicate two types, your adapter model cla
  
     class CountryPresenter : ViewHolderPresenter<Country, CountryPresenter.View>() { ... }
     
-ViewHolderPresenter receives the following lifecycle events:
+**ViewHolderPresenter receives the following lifecycle events:**
  
  <p align="center">
   <img src ="/lifecycle.png" />
