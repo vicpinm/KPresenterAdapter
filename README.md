@@ -1,11 +1,11 @@
 # KPresenterAdapter
 
-KPresenterAdapter is a lighweight Android library to implement adapters for your RecyclerViews in a clean way, using the MVP pattern. The main purpose of this library is to organize your adapter related your in a way that you will only has to focus on writing the pieces of code that really matters: view classes and presenter classes for that views, like you would do with fragments or activities. Additionally, this library provides other useful features.
+KPresenterAdapter is a lighweight Android library to implement adapters for your RecyclerViews in a clean way, using the MVP pattern. The main purpose of this library is to organize your adapter related code so that you will only have to focus on writing the pieces of code that really matters: view classes and presenter classes for that views, like you would do with your fragments or activities. Additionally, this library provides other useful features you might find useful.
 
 ## Features
-  * Simple framework to write viewholder classes and presenter classes, following the MVP pattern, and avoiding writting boilerplate code related with adapters. 
-  * View representation and view logic decoupled from adapter framework classes, so that they are much easier to test.
-  * Easy management of different types of views for the same collection.
+  * Simple framework to write viewholder and presenter classes, following the MVP pattern, and avoiding writting boilerplate code related with adapters. 
+  * View representation and view logic code decoupled from adapter framework classes, so that they are much easier to test.
+  * Easy management of different types of views in the same collection.
   * Lifecycle callbacks in presenter clases. You can control view creation and destroy for each adapter position. Presenters are notified when they are destroyed to perform clear and unsubscribe operations if needed.
   * Custom presenter creation. You are responsible for creating presenter instance the same way yo usually do in your Activities or Fragments, which allows you to use tools like Dagger to inject your dependencies (see description below for details).
 
