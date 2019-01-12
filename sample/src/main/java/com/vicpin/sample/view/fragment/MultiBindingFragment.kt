@@ -6,21 +6,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.vicpin.kpresenteradapter.PresenterAdapter
-import com.vicpin.kpresenteradapter.SimplePresenterAdapter
-import com.vicpin.kpresenteradapter.SingleLinePresenterAdapter
 import com.vicpin.kpresenteradapter.extensions.inflate
 import com.vicpin.sample.R
 import com.vicpin.sample.data.MixedRepository
-import com.vicpin.sample.di.Injector
 import com.vicpin.sample.extensions.finishIdlingResource
 import com.vicpin.sample.extensions.showToast
 import com.vicpin.sample.extensions.startIdlingResource
 import com.vicpin.sample.model.Country
 import com.vicpin.sample.model.IRepository
 import com.vicpin.sample.model.NamedItem
-import com.vicpin.sample.view.adapter.CountryView
-import com.vicpin.sample.view.adapter.HeaderView
 import com.vicpin.sample.view.adapter.MultiBindingAdapter
 import com.vicpin.sample.view.interfaces.ItemDeletedListener
 import com.vicpin.sample.view.interfaces.ItemRecycledListener
@@ -54,7 +48,7 @@ class MultiBindingFragment : Fragment(), ItemRecycledListener, ItemDeletedListen
 
     private fun setupAdapter() {
         adapter = MultiBindingAdapter()
-        adapter.notifyScrollStopped(recycler)
+        adapter.notifyScrollStatus(recycler)
         adapter.enableLoadMore { onLoadMore() }
 
     }

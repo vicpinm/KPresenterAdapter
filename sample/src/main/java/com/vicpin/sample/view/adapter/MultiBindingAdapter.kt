@@ -11,7 +11,6 @@ class MultiBindingAdapter : PresenterAdapter<NamedItem>() {
 
     override fun getViewInfo(position: Int): ViewInfo<NamedItem> {
         val item = getData()[position]
-
         return when(item) {
             is Country -> ViewInfo(CountryView::class, R.layout.adapter_country)
             else -> ViewInfo(TownViewHolderParent::class, R.layout.adapter_town)

@@ -221,7 +221,7 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
     fun getHeadersCount(): Int = headers.size
 
 
-    fun notifyScrollStopped(recycler: RecyclerView) {
+    fun notifyScrollStatus(recycler: RecyclerView) {
         this.recyclerView = recycler
         recycler?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
