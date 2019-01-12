@@ -134,8 +134,8 @@ Click and long click listeners methods are provided to be invoked when users int
 ```kotlin
  private fun appendListeners() {
         adapter.apply {
-            itemClickListener = { item, view -> showToast("Country clicked ${item.name}) }
-            itemLongClickListener = { item, view -> showToast("Country long pressed ${item.name}) }
+            itemClickListener = { item, view -> showToast("Country clicked ${item.name}") }
+            itemLongClickListener = { item, view -> showToast("Country long pressed ${item.name}") }
             customListener = this@ManualBindingFragment
         }
     }
