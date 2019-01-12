@@ -1,13 +1,16 @@
-# KPresenterAdapter
-
+ <p align="center">
+  <img width="80%" src ="/kpresenteradapter.png" />
+</p>
 KPresenterAdapter is a lighweight Android library to implement adapters for your RecyclerViews in a clean way, using the MVP pattern. The main purpose of this library is to organize your adapter related code so that you will only have to focus on writing the pieces of code that really matters: view classes and presenter classes for that views, like you would do with your fragments or activities. Additionally, this library provides other useful features you might find useful.
 
 ## Features
   * Simple framework to write viewholder and presenter classes, following the MVP pattern, and avoiding writting boilerplate code related with adapters. 
   * View representation and view logic code decoupled from adapter framework classes, so that they are much easier to test.
   * Easy management of different types of views in the same collection.
+  * Built-in "load more" mechanism.
   * Lifecycle callbacks in presenter clases. You can control view creation and destroy for each adapter position. Presenters are notified when they are destroyed to perform clear and unsubscribe operations if needed.
   * Custom presenter creation. You are responsible for creating presenter instance the same way yo usually do in your Activities or Fragments, which allows you to use tools like Dagger to inject your dependencies (see description below for details).
+  * Easy scroll management
 
 ## Architecture overview
 The diagram below shows how this library is built in order to apply MVP pattern to adapter classes. As you can see, you are only responsible to implement the classes with yellow background: viewholder class and its presenter class. 
@@ -28,11 +31,18 @@ Extracted from the sample project, CountryView.kt is the class which implements 
   
     val adapter = SimplePresenterAdapter(CountryView::class, R.layout.adapter_country)
     recyclerView.adapter = adapter
+    
+Then, you can set your data collection with ```setData(list)``` method, or ```addData(listToAppend)``` method. 
+Also, you can enable a "load more" indicator when scroll reachs to the end of the list, and you will be notified in that moment in order to append more data to your list:
+
+```kotlin
+adapter.enableLoadMore { onLoadMore() }
+```
 
 ### View class
 Your view class inherits from ViewHolder<Model> class. As mentioned earlier, this class is responsible for implementing the view layer in MPV pattern, and provide a presenter instance. **This presenter instance will be used only for this viewholder instance. As your viewholder is reused for other adapter positions when you scroll, this presenter instance will be reused to, so you don't have to worry about performance or memory issues.**
 
- ```
+ ```kotlin
  class CountryView(itemView: View) : ViewHolder<Country>(itemView), CountryPresenter.View {
 
     override var presenter = CountryPresenter()
@@ -55,10 +65,10 @@ As you can see, this class is very similar to a fragment or activity class. It c
 
 ### Presenter class
 Class responsible for implementing the presenter layer in MPV pattern, equivalent to any other presenter. It inherits from ViewHolderPresenter<Model, View> class. 
-This class is generic and you need to indicate two types, your adapter model class (<Country> in this sample) and your presenter view interface class. So following our sample, the declaration of our CountryPresenter class will like like:
- 
+This class is generic and you need to indicate two types, your adapter model class (<Country> in this sample) and your presenter view interface class. So following our sample, the declaration of our CountryPresenter class will be like like:
+ ```kotlin
     class CountryPresenter : ViewHolderPresenter<Country, CountryPresenter.View>() { ... }
-    
+ ```
 **ViewHolderPresenter receives the following lifecycle events:**
  
  <p align="center">
@@ -66,13 +76,13 @@ This class is generic and you need to indicate two types, your adapter model cla
 </p>
 
 
-onCreate method is mandatory and the rest is optional. 
+**onCreate method is mandatory and the rest are optional.**
 
 Inside your presenter class, you have access to a "data" parameter, in order to get the data instance to be bound to that adapter position. Also, you have access to a "dataCollection" parameter if you need to perform other operations with your entire collection. 
 
-Last, inside your presenter class, you have access to the "view" parameter, in order to interact with your view class as you normally do in a presenter class. Below you can see a simplified version of the CountryPresenter class:
+Also, inside your presenter class, you have access to the "view" parameter, in order to interact with your view class as you normally do in presenter classes. Below you can see a simplified version of the CountryPresenter class:
 
-```
+```kotlin
 class CountryPresenter : ViewHolderPresenter<Country, CountryPresenter.View>() {
 
     override fun onCreate() {
@@ -91,43 +101,58 @@ class CountryPresenter : ViewHolderPresenter<Country, CountryPresenter.View>() {
 }
 ```
 
+In this sample, you can see another utility method called ```deleteItemFromCollection()```, which allows you to delete the item from your current collection loaded in the adapter with a smooth animation.
+
+If you pass a reference of your recyclerview to your adapter with ```adapter.notifyScrollStatus(recycler)```, you will be able to check your recyclerview's scroll status in your presenter classes. For that, presenter classes provide a callback method that you can override called ```onScrollStoped(). This method is invoked every time you perform scroll in your list and it reaches the IDLE status. Also, in your presenter class, you have access to a parameter called "scrollStatus", which is always updated with tha last scroll status reported by your recyclerView. It can contains one of the three possible exiting statuses: ```OnScrollListener.SCROLL_STATE_IDLE```, ```OnScrollListener.SCROLL_STATE_TOUCH_SCROLL```, ```OnScrollListener.SCROLL_STATE_FLING```.
+
 ### Multiple view type adapter
 
-It is very easy to implement multiple view types in for your RecyclerView. Instead of use SimpleAdapterPresenter, you have to implement your own adapter, in order to implement your representation logic. Your adapter class must extends from PresenterAdapter class.
-PresenterAdapter class has only one abstract method you have to implement, getViewInfo(int position) method. This method returns an instance of ViewInfo class, which holds an association between your view class and your layour resource for a given position.
+It is very easy to implement an adapter with multiple view types. Instead of use SimpleAdapterPresenter, you have to create a class which extends from PresenterAdapter class, in order to implement your mapping logic between your models and your views. 
+
+PresenterAdapter class has only one abstract method you have to implement, ```getViewInfo(position: Int)``` method. This method returns an instance of ViewInfo class, which holds an association between your view class and your layour resource for a given position.
 
 
 ##### Example of different types of views based on item position, using the same view class and differents layouts:
+```kotlin
+class MultipleAdapter: PresenterAdapter<Country> {
 
-    public class MultipleAdapter extends PresenterAdapter<Country> {
-
-    @Override public ViewInfo getViewInfo(int position) {
-        if(position % 2 == 0)
-            return ViewInfo.with(CountryView.class).setLayout(R.layout.adapter_country_even);
+    override fun getViewInfo(position: Int): ViewInfo<Country> {
+        return if(position % 2 == 0)
+            ViewInfo(CountryView::class, R.layout.adapter_country_even)
         else
-            return ViewInfo.with(CountryView.class).setLayout(R.layout.adapter_country_odd);
+            ViewInfo(CountryView::class, R.layout.adapter_country_odd)
     }
 }
-
+```
 ##### Example of different types of views based on item properties, using diferent view clases and layouts:
+```kotlin
+class MultipleAdapter: PresenterAdapter<Country> {
 
-public class MultipleAdapter extends PresenterAdapter<Country> {
-
-    @Override public ViewInfo getViewInfo(int position) {
-        if((getItem(position).isFavourite())
-            return ViewInfo.with(FavouriteItemView.class).setLayout(R.layout.adapter_favourite_item);
+    override fun getViewInfo(position: Int): ViewInfo<Country> {
+        return if((getItem(position).isFavourite())
+            ViewInfo(FavouriteItemView::class, R.layout.adapter_favourite_item)
         else
-            return ViewInfo.with(NormalItemView.class).setLayout(R.layout.adapter_normal_item);
+            ViewInfo(NormalItemView::class, R.layout.adapter_normal_item)
     }
-
+```
 ### Event listeners
 
-Click and long click listeners methods are provided to be notified when users interacts with your views. Also, you can set a custom object listener to be manually invoked from your view class when you want. See sample for details. 
+Click and long click listeners methods are provided to be invoked when users interacts with your views. Also, you can set a custom object listener to be manually invoked from your view class when you want. You can see an example of these listeners in ManualBindingFragment.kt from sample module:
+
+```kotlin
+ private fun appendListeners() {
+        adapter.apply {
+            itemClickListener = { item, view -> showToast("Country clicked ${item.name}") }
+            itemLongClickListener = { item, view -> showToast("Country long pressed ${item.name}") }
+            customListener = this@ManualBindingFragment
+        }
+    }
+```
 
 
 ## Proguard
 
-    -keepclassmembers public class * extends com.vicpin.presenteradapter.ViewHolder {
+    -keepclassmembers public class * extends com.vicpin.kpresenteradapter.ViewHolder {
         public <init>(...);
     }
 
