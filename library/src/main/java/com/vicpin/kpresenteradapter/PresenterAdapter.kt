@@ -1,13 +1,15 @@
 package com.vicpin.kpresenteradapter
 
 import android.os.Handler
+import android.util.Log
 import androidx.annotation.LayoutRes
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.ViewGroup
 import android.widget.AbsListView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.vicpin.kpresenteradapter.extensions.forEachVisibleView
 import com.vicpin.kpresenteradapter.extensions.inflate
 import com.vicpin.kpresenteradapter.extensions.refreshData
 import com.vicpin.kpresenteradapter.model.ViewInfo
@@ -35,7 +37,8 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
     var itemClickListener: ((item: T, view: ViewHolder<T>) -> Unit)? = null
     var itemLongClickListener: ((item: T, view: ViewHolder<T>) -> Unit)? = null
     var loadMoreListener: (() -> Unit)? = null
-    var recyclerView: androidx.recyclerview.widget.RecyclerView? = null
+    var recyclerView: RecyclerView? = null
+    var scrollState = AbsListView.OnScrollListener.SCROLL_STATE_IDLE
 
     /**
      * Sets a custom listener instance. You can call to the listener from your ViewHolder classes with getCustomListener() method.
@@ -77,8 +80,8 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
 
     private fun isHeaderType(viewType: Int) = viewType >= HEADER_TYPE && viewType < HEADER_MAX_TYPE
 
-    private fun getViewHolder(parent: ViewGroup, viewInfo: ViewInfo<T>) : ViewHolder<T> {
-        val view = viewInfo.view ?: if(viewInfo.viewResourceId != null) {
+    private fun getViewHolder(parent: ViewGroup, viewInfo: ViewInfo<T>): ViewHolder<T> {
+        val view = viewInfo.view ?: if (viewInfo.viewResourceId != null) {
             parent.inflate(viewInfo.viewResourceId!!)
         } else throw IllegalArgumentException("Either viewResourceId or view arguments must be provided to viewInfo class")
 
@@ -95,8 +98,8 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
         }
     }
 
-    private fun getTypeForViewHolder(viewInfo: ViewInfo<T>) : Int{
-        if(!registeredViewInfo.contains(viewInfo)){
+    private fun getTypeForViewHolder(viewInfo: ViewInfo<T>): Int {
+        if (!registeredViewInfo.contains(viewInfo)) {
             registeredViewInfo.add(viewInfo)
         }
         return registeredViewInfo.indexOf(viewInfo)
@@ -120,7 +123,7 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
     override fun onBindViewHolder(holder: ViewHolder<T>, position: Int) {
         when {
             isNormalPosition(position) -> {
-                holder.onBind(data, getPositionWithoutHeaders(position), deleteListener = {
+                holder.onBind(data, getPositionWithoutHeaders(position), this@PresenterAdapter.scrollState, deleteListener = {
                     removeItem(getPositionWithoutHeaders(holder.adapterPosition))
                 })
                 appendListeners(holder)
@@ -151,12 +154,12 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
         }
     }
 
-    private fun appendListeners(viewHolder: ViewHolder<T>){
-        if(itemClickListener != null){
+    private fun appendListeners(viewHolder: ViewHolder<T>) {
+        if (itemClickListener != null) {
             viewHolder.itemView.setOnClickListener { itemClickListener?.invoke(getItem(viewHolder.adapterPosition), viewHolder) }
         }
 
-        if(itemLongClickListener != null){
+        if (itemLongClickListener != null) {
             viewHolder.itemView.setOnLongClickListener { itemLongClickListener?.invoke(getItem(viewHolder.adapterPosition), viewHolder); true }
         }
     }
@@ -174,13 +177,13 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
     override fun getItem(position: Int) = data[getPositionWithoutHeaders(position)]
 
 
-    fun addHeader(@LayoutRes layout: Int, viewHolderClass: KClass<out ViewHolder<T>>? = null){
+    fun addHeader(@LayoutRes layout: Int, viewHolderClass: KClass<out ViewHolder<T>>? = null) {
         this.headers.add(ViewInfo(viewHolderClass, layout))
         HEADER_MAX_TYPE = HEADER_TYPE + headers.size
     }
 
-    fun updateHeaders(){
-        if(this.headers.size > 0){
+    fun updateHeaders() {
+        if (this.headers.size > 0) {
             notifyItemRangeChanged(0, headers.size)
         }
     }
@@ -190,16 +193,13 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
      * @param data items collection
      * @return PresenterAdapter called instance
      */
-    fun setData(data: List<T>) : PresenterAdapter<T>{
+    fun setData(data: List<T>): PresenterAdapter<T> {
         this.data = data.toMutableList()
         this.loadMoreInvoked = false
-        if(enableEnimations) {
+        if (enableEnimations) {
             submitList(data)
         } else {
             notifyDataSetChanged()
-        }
-        recyclerView?.let {
-            Handler().postDelayed({ notifyScrollStoppedToCurrentViews(it) }, 0)
         }
         return this
     }
@@ -210,49 +210,50 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
      * @param recyclerView RecyclerView instance
      * @return PresenterAdapter called instance
      */
-    fun setDataKeepScroll(data: MutableList<T>, recyclerView: androidx.recyclerview.widget.RecyclerView){
+    fun setDataKeepScroll(data: MutableList<T>, recyclerView: RecyclerView) {
         this.data = data
         this.loadMoreInvoked = false
         refreshData(recyclerView)
     }
 
-    override fun getItemCount() = data.size + headers.size + if(loadMoreEnabled) 1 else 0
+    override fun getItemCount() = data.size + headers.size + if (loadMoreEnabled) 1 else 0
 
-    fun getHeadersCount() : Int = headers.size
+    fun getHeadersCount(): Int = headers.size
 
 
-    fun notifyScrollStopped(recycler: androidx.recyclerview.widget.RecyclerView) {
+    fun notifyScrollStopped(recycler: RecyclerView) {
         this.recyclerView = recycler
-        recycler?.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: androidx.recyclerview.widget.RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING || newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-                    //Do nothing
-                } else {
-                    notifyScrollStoppedToCurrentViews(recycler)
-                }
+        recycler?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                notifyScrollStateToCurrentViews(recycler, newState)
             }
         })
     }
 
-    private fun notifyScrollStoppedToCurrentViews(recycler: androidx.recyclerview.widget.RecyclerView) {
-        if(recycler.layoutManager != null) {
-            val firstPosition = (recycler.layoutManager as androidx.recyclerview.widget.LinearLayoutManager).findFirstVisibleItemPosition()
-            val lastPosition = (recycler.layoutManager as androidx.recyclerview.widget.LinearLayoutManager).findLastVisibleItemPosition()
-            for (i in firstPosition..lastPosition) {
-                recycler.findViewHolderForAdapterPosition(i)?.let {
-                    (it as? ViewHolder<*>)?.onScrollStopped()
+    private fun notifyScrollStateToCurrentViews(recycler: RecyclerView, state: Int) {
+        recycler.forEachVisibleView { position ->
+
+            recycler.findViewHolderForAdapterPosition(position)?.let {
+                (it as? ViewHolder<*>)?.apply {
+                    this@PresenterAdapter.scrollState = state
+                    setScrollState(state)
+
+                    if (isScrollStopped(state)) {
+                        onScrollStopped()
+                    }
                 }
             }
         }
     }
+
+    private fun isScrollStopped(state: Int) = state == AbsListView.OnScrollListener.SCROLL_STATE_IDLE
 
     /**
      * Add data at the end of the current data list and notifies the change
      * @param data items collection to append at the end of the current collection
      * @return PresenterAdapter called instance
      */
-    fun addData(data: List<T>){
+    fun addData(data: List<T>) {
 
         this.loadMoreInvoked = false
         val currentItemCount = itemCount
@@ -260,17 +261,15 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
         val dataSize = data.size
 
         Handler().post {
-            if(loadMoreEnabled){
+            if (loadMoreEnabled) {
                 notifyItemChanged(currentItemCount - 1)
-            }
-            else{
+            } else {
                 notifyItemRangeInserted(currentItemCount, dataSize)
             }
-            Handler().postDelayed({ recyclerView?.let { notifyScrollStoppedToCurrentViews(it) }}, 0)
         }
     }
 
-    fun clearData(){
+    fun clearData() {
         this.data.clear()
         notifyDataSetChanged()
     }
@@ -279,8 +278,8 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
     /**
      * Remove item object from data collection
      */
-    fun removeItem(item: T){
-        if(this.data.contains(item)){
+    fun removeItem(item: T) {
+        if (this.data.contains(item)) {
             val pos = this.data.indexOf(item)
             this.data.remove(item)
             notifyItemRemoved(getPositionWithHeaders(pos))
@@ -291,7 +290,7 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
      * Remove item position from data collection. Position argument does no take into account headers.
      */
     fun removeItem(position: Int) {
-        if(position >= 0 && position < this.data.size) {
+        if (position >= 0 && position < this.data.size) {
             this.data.removeAt(position)
             notifyItemRemoved(getPositionWithHeaders(position))
         }
@@ -364,7 +363,7 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
      * Enable load more option for paginated collections
      * @param loadMoreListener
      */
-    fun enableLoadMore(loadMoreListener:  (() -> Unit)?) {
+    fun enableLoadMore(loadMoreListener: (() -> Unit)?) {
         this.loadMoreEnabled = true
         this.loadMoreInvoked = false
         this.loadMoreListener = loadMoreListener
@@ -375,7 +374,7 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
      * Disable load more option
      */
     fun disableLoadMore() {
-        if(this.loadMoreEnabled) {
+        if (this.loadMoreEnabled) {
             this.loadMoreEnabled = false
             this.loadMoreInvoked = false
             notifyItemRemoved(itemCount)
@@ -385,10 +384,9 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
     fun isLoadMoreEnabled() = loadMoreEnabled
 
     override fun getItemId(position: Int): Long {
-        if(isLoadMorePosition(position)){
+        if (isLoadMorePosition(position)) {
             return Companion.LOAD_MORE_TYPE.toLong()
-        }
-        else if (hasStableIds()) {
+        } else if (hasStableIds()) {
             return if (position < getHeadersCount()) headers[position].hashCode().toLong() else getItem(position).hashCode().toLong()
         } else {
             return super.getItemId(position)
@@ -398,13 +396,11 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
     fun getData() = data
 
 
-
-
 }
 
-class DiffUtilCallback<T: Any>: DiffUtil.ItemCallback<T>() {
+class DiffUtilCallback<T : Any> : DiffUtil.ItemCallback<T>() {
     override fun areItemsTheSame(p0: T, p1: T): Boolean {
-        return if(p0 is Identifable<*> && p1 is Identifable<*>) {
+        return if (p0 is Identifable<*> && p1 is Identifable<*>) {
             (p0 as Identifable<*>).getId() == (p1 as Identifable<*>).getId()
         } else {
             false

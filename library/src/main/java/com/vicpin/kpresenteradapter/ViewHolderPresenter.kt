@@ -1,5 +1,6 @@
 package com.vicpin.kpresenteradapter
 
+import android.widget.AbsListView
 import com.vicpinm.autosubscription.Unsubscriber
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -16,6 +17,8 @@ abstract class ViewHolderPresenter<Data : Any, PresenterView: Any> {
     lateinit var data: Data
     lateinit var dataCollection: List<Data>
     var onDeleteListener: (() -> Unit)? = null
+    var scrollState: Int = AbsListView.OnScrollListener.SCROLL_STATE_IDLE
+
     val presenterId: Int by lazy { presenterIdsGenerator.andIncrement }
 
     fun setPresenterView(view: Any){

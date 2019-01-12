@@ -1,14 +1,15 @@
 package com.vicpin.kpresenteradapter
 
 import android.content.Context
-import androidx.recyclerview.widget.RecyclerView
 import android.view.View
+import android.widget.AbsListView
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.extensions.LayoutContainer
 
 /**
  * Created by Victor on 01/11/2016.
  */
-abstract class ViewHolder<T: Any> : androidx.recyclerview.widget.RecyclerView.ViewHolder, LayoutContainer {
+abstract class ViewHolder<T: Any> : RecyclerView.ViewHolder, LayoutContainer {
 
     abstract val presenter: ViewHolderPresenter<T, *>?
     val context: Context
@@ -21,8 +22,8 @@ abstract class ViewHolder<T: Any> : androidx.recyclerview.widget.RecyclerView.Vi
         context = itemView.context
     }
 
-    fun <A: T> onBind(data: List<A>, position: Int, deleteListener: () -> Unit){
-        setupPresenter(data, deleteListener)
+    fun <A: T> onBind(data: List<A>, position: Int, scrollState: Int, deleteListener: () -> Unit){
+        setupPresenter(data, deleteListener, scrollState)
         presenter?.data = data[position]
         presenter?.onCreate()
     }
@@ -38,18 +39,21 @@ abstract class ViewHolder<T: Any> : androidx.recyclerview.widget.RecyclerView.Vi
     }
 
     fun onAttached() {
-        presenter?.onAttached()
+        presenter?.onAttach()
     }
 
     fun onDetached() {
-        presenter?.onDetached()
+        presenter?.onDetach()
     }
 
 
-    private fun <A: T> setupPresenter(data: List<A>, listener: (() -> Unit)? = null){
-        presenter?.setPresenterView(this)
-        presenter?.dataCollection = data
-        presenter?.onDeleteListener = listener
+    private fun <A: T> setupPresenter(data: List<A>, listener: (() -> Unit)? = null, scrollState: Int = 0){
+        presenter?.apply {
+            setPresenterView(this@ViewHolder)
+            dataCollection = data
+            onDeleteListener = listener
+            this.scrollState = scrollState
+        }
     }
 
     fun onScrollStopped() {
@@ -58,5 +62,9 @@ abstract class ViewHolder<T: Any> : androidx.recyclerview.widget.RecyclerView.Vi
 
     fun onDestroy(){
         presenter?.onPreDestroy()
+    }
+
+    fun setScrollState(state: Int) {
+        presenter?.scrollState = state
     }
 }
