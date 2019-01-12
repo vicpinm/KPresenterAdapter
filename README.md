@@ -7,6 +7,7 @@ KPresenterAdapter is a lighweight Android library to implement adapters for your
   * Simple framework to write viewholder and presenter classes, following the MVP pattern, and avoiding writting boilerplate code related with adapters. 
   * View representation and view logic code decoupled from adapter framework classes, so that they are much easier to test.
   * Easy management of different types of views in the same collection.
+  * Built-in "load more" mechanism.
   * Lifecycle callbacks in presenter clases. You can control view creation and destroy for each adapter position. Presenters are notified when they are destroyed to perform clear and unsubscribe operations if needed.
   * Custom presenter creation. You are responsible for creating presenter instance the same way yo usually do in your Activities or Fragments, which allows you to use tools like Dagger to inject your dependencies (see description below for details).
   * Easy scroll management
@@ -30,6 +31,13 @@ Extracted from the sample project, CountryView.kt is the class which implements 
   
     val adapter = SimplePresenterAdapter(CountryView::class, R.layout.adapter_country)
     recyclerView.adapter = adapter
+    
+Then, you can set your data collection with ```setData(list)``` method, or ```addData(listToAppend)``` method. 
+Also, you can enable a "load more" indicator when scroll reachs to the end of the list, and you will be notified in that moment in order to append more data to your list:
+
+```kotlin
+adapter.enableLoadMore { onLoadMore() }
+```
 
 ### View class
 Your view class inherits from ViewHolder<Model> class. As mentioned earlier, this class is responsible for implementing the view layer in MPV pattern, and provide a presenter instance. **This presenter instance will be used only for this viewholder instance. As your viewholder is reused for other adapter positions when you scroll, this presenter instance will be reused to, so you don't have to worry about performance or memory issues.**
@@ -95,7 +103,7 @@ class CountryPresenter : ViewHolderPresenter<Country, CountryPresenter.View>() {
 
 In this sample, you can see another utility method called ```deleteItemFromCollection()```, which allows you to delete the item from your current collection loaded in the adapter with a smooth animation.
 
-Presenter classes also provide a callback method that you can override called onScrollStoped(). This method is invoked every time you perform scroll in your list and it reach the IDLE status. Also, in your presenter class, you have access to a parameter called "scrollStatus", which is always updated with tha last scroll status reported by your recyclerView. It can contains one of the three possible exiting statuses: ```OnScrollListener.SCROLL_STATE_IDLE```, ```OnScrollListener.SCROLL_STATE_TOUCH_SCROLL```, ```OnScrollListener.SCROLL_STATE_FLING```.
+If you pass a reference of your recyclerview to your adapter with ```adapter.notifyScrollStatus(recycler)```, you will be able to check your recyclerview's scroll status in your presenter classes. For that, presenter classes provide a callback method that you can override called ```onScrollStoped(). This method is invoked every time you perform scroll in your list and it reaches the IDLE status. Also, in your presenter class, you have access to a parameter called "scrollStatus", which is always updated with tha last scroll status reported by your recyclerView. It can contains one of the three possible exiting statuses: ```OnScrollListener.SCROLL_STATE_IDLE```, ```OnScrollListener.SCROLL_STATE_TOUCH_SCROLL```, ```OnScrollListener.SCROLL_STATE_FLING```.
 
 ### Multiple view type adapter
 
