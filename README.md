@@ -144,7 +144,7 @@ Click and long click listeners methods are provided to be invoked when users int
 
 ## Proguard
 
-    -keepclassmembers public class * extends com.vicpin.presenteradapter.ViewHolder {
+    -keepclassmembers public class * extends com.vicpin.kpresenteradapter.ViewHolder {
         public <init>(...);
     }
 
