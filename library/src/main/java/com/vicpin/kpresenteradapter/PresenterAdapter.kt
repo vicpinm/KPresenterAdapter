@@ -1,13 +1,10 @@
 package com.vicpin.kpresenteradapter
 
 import android.os.Handler
-import android.util.Log
-import androidx.annotation.LayoutRes
 import android.view.ViewGroup
 import android.widget.AbsListView
+import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.vicpin.kpresenteradapter.extensions.forEachVisibleView
 import com.vicpin.kpresenteradapter.extensions.inflate
@@ -15,14 +12,15 @@ import com.vicpin.kpresenteradapter.extensions.refreshData
 import com.vicpin.kpresenteradapter.model.ViewInfo
 import com.vicpin.kpresenteradapter.test.Identifable
 import com.vicpin.kpresenteradapter.viewholder.LoadMoreViewHolder
-import java.lang.IndexOutOfBoundsException
 import java.util.*
 import kotlin.reflect.KClass
+
+
 
 /**
  * Created by Victor on 01/11/2016.
  */
-abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffUtilCallback<T>()) {
+abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(DiffUtilCallback<T>()) {
 
     /**
      * Data collections
@@ -37,7 +35,12 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
     var itemClickListener: ((item: T, view: ViewHolder<T>) -> Unit)? = null
     var itemLongClickListener: ((item: T, view: ViewHolder<T>) -> Unit)? = null
     var loadMoreListener: (() -> Unit)? = null
-    var recyclerView: RecyclerView? = null
+    var mRecyclerView: RecyclerView? = null
+
+    override fun getRecyclerView(): RecyclerView? {
+        return mRecyclerView
+    }
+
     var scrollState = AbsListView.OnScrollListener.SCROLL_STATE_IDLE
 
     /**
@@ -52,7 +55,8 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
     private var loadMoreEnabled: Boolean = false
     private var loadMoreInvoked: Boolean = false
     private var HEADER_MAX_TYPE = HEADER_TYPE
-    var enableEnimations = false
+    private var enableAnimations = false
+
 
     companion object {
         const val LOAD_MORE_TYPE = Int.MAX_VALUE
@@ -196,8 +200,10 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
     fun setData(data: List<T>): PresenterAdapter<T> {
         this.data = data.toMutableList()
         this.loadMoreInvoked = false
-        if (enableEnimations) {
+        if (enableAnimations) {
+
             submitList(data)
+
         } else {
             notifyDataSetChanged()
         }
@@ -222,7 +228,7 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
 
 
     fun notifyScrollStatus(recycler: RecyclerView) {
-        this.recyclerView = recycler
+        this.mRecyclerView = recycler
         recycler?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 notifyScrollStateToCurrentViews(recycler, newState)
@@ -394,6 +400,12 @@ abstract class PresenterAdapter<T : Any>() : ListAdapter<T, ViewHolder<T>>(DiffU
     }
 
     fun getData() = data
+
+
+    fun enableAnimations(recyclerView: RecyclerView) {
+        this.mRecyclerView = recyclerView
+        this.enableAnimations = true
+    }
 
 
 }
