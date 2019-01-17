@@ -11,6 +11,7 @@ KPresenterAdapter is a lighweight Android library to implement adapters for your
   * Lifecycle callbacks in presenter clases. You can control view creation and destroy for each adapter position. Presenters are notified when they are destroyed to perform clear and unsubscribe operations if needed.
   * Custom presenter creation. You are responsible for creating presenter instance the same way yo usually do in your Activities or Fragments, which allows you to use tools like Dagger to inject your dependencies (see description below for details).
   * Easy scroll management
+  * Animations for data changes simplified (library uses internally DiffUtil). See description below. 
 
 ## Architecture overview
 The diagram below shows how this library is built in order to apply MVP pattern to adapter classes. As you can see, you are only responsible to implement the classes with yellow background: viewholder class and its presenter class. 
@@ -148,6 +149,14 @@ Click and long click listeners methods are provided to be invoked when users int
         }
     }
 ```
+
+### Animations
+You can enable animations in your adapter in a very simple way, with:
+```kotlin
+adapter.enableAnimations(recyclerView)
+````
+
+To make it work, your model class should implement interface ```Identifable<T>```, which only contains one method: ```getId(): T```. This method should return an unique identifier of type T for each item in your collection. Also, your model class should implement ```equals()``` method (if you use a data class, that method is automatically generated for you). This is necesary so that DiffUtil utility can compare items in your collecitons and perform the corresponding animations when items changes (like deletions, aditions or displacements). 
 
 
 ## Proguard
