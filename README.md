@@ -174,10 +174,10 @@ repositories {
     mavenCentral()
 }
 
-compile 'com.github.vicpinm:kpresenteradapter:2.0.2'
+compile 'com.github.vicpinm:kpresenteradapter:3.0.0'
 ```
 
 ## Author
 
-Víctor Manuel Pineda Murcia | http://vicpinm.github.io/PresenterAdapter/
+Víctor Manuel Pineda Murcia | http://vicpinm.github.io/KPresenterAdapter/
 
