@@ -1,6 +1,7 @@
  <p align="center">
   <img width="80%" src ="/kpresenteradapter.png" />
 </p>
+
 **KPresenterAdapter is a lighweight Android library to implement adapters for your RecyclerViews in a clean way, using the MVP pattern. The main purpose of this library is to organize your adapter related code so that you will only have to focus on writing the pieces of code that really matters: view classes and presenter classes for that views, like you would do with your fragments or activities. Additionally, this library provides other useful features you might find useful.**
 
 ## Features
