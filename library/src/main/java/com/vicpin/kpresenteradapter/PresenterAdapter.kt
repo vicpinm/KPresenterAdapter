@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import android.widget.AbsListView
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vicpin.kpresenteradapter.extensions.forEachVisibleView
 import com.vicpin.kpresenteradapter.extensions.inflate
