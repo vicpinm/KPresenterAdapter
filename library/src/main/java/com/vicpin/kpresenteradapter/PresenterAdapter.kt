@@ -230,6 +230,22 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
     fun notifyScrollStatus(recycler: RecyclerView) {
         this.mRecyclerView = recycler
         recycler?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                (recycler.layoutManager as? LinearLayoutManager)?.let {
+                    val offset = if(it.orientation == LinearLayoutManager.VERTICAL) {
+                        dy
+                    } else { dx }
+
+                    if(Math.abs(offset) < 3) {
+                        notifyScrollStateToCurrentViews(recycler, AbsListView.OnScrollListener.SCROLL_STATE_IDLE)
+                    }
+                }
+
+            }
+
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 notifyScrollStateToCurrentViews(recycler, newState)
             }
