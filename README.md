@@ -175,7 +175,7 @@ repositories {
     mavenCentral()
 }
 
-compile 'com.github.vicpinm:kpresenteradapter:3.0.0'
+implementation 'com.github.vicpinm:kpresenteradapter:3.0.1'
 ```
 
 ## Author
