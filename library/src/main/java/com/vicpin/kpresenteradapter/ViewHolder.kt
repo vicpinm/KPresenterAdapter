@@ -2,7 +2,6 @@ package com.vicpin.kpresenteradapter
 
 import android.content.Context
 import android.view.View
-import android.widget.AbsListView
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.extensions.LayoutContainer
 
@@ -17,6 +16,12 @@ abstract class ViewHolder<T: Any> : RecyclerView.ViewHolder, LayoutContainer {
 
     override val containerView: View?
         get() = itemView
+
+    var visible: Boolean = false
+        set(value) {
+            field = value
+            presenter?.visible = field
+        }
 
     constructor(itemView: View) : super(itemView){
         context = itemView.context
@@ -43,6 +48,8 @@ abstract class ViewHolder<T: Any> : RecyclerView.ViewHolder, LayoutContainer {
     }
 
     fun onDetached() {
+        visible = false
+        presenter?.visible = false
         presenter?.onDetach()
     }
 
@@ -58,6 +65,10 @@ abstract class ViewHolder<T: Any> : RecyclerView.ViewHolder, LayoutContainer {
 
     fun onScrollStopped() {
         presenter?.onScrollStoped()
+    }
+
+    fun onShowed() {
+        presenter?.onShowed()
     }
 
     fun onDestroy(){

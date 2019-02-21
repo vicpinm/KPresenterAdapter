@@ -20,6 +20,7 @@ abstract class ViewHolderPresenter<Data : Any, PresenterView: Any> {
     var scrollState: Int = AbsListView.OnScrollListener.SCROLL_STATE_IDLE
 
     val presenterId: Int by lazy { presenterIdsGenerator.andIncrement }
+    var visible: Boolean = false
 
     fun setPresenterView(view: Any){
         this.view = view as? PresenterView
@@ -59,6 +60,10 @@ abstract class ViewHolderPresenter<Data : Any, PresenterView: Any> {
 
     fun deleteItemFromCollection() {
         onDeleteListener?.invoke()
+    }
+
+    open fun onShowed() {
+
     }
 
 

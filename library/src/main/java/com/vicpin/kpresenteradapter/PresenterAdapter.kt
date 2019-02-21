@@ -1,15 +1,17 @@
 package com.vicpin.kpresenteradapter
 
+import android.graphics.Rect
+import android.graphics.RectF
 import android.os.Handler
 import android.view.ViewGroup
 import android.widget.AbsListView
 import androidx.annotation.LayoutRes
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.vicpin.kpresenteradapter.extensions.forEachVisibleView
-import com.vicpin.kpresenteradapter.extensions.inflate
-import com.vicpin.kpresenteradapter.extensions.refreshData
+import com.google.android.material.appbar.AppBarLayout
+import com.vicpin.kpresenteradapter.extensions.*
 import com.vicpin.kpresenteradapter.model.ViewInfo
 import com.vicpin.kpresenteradapter.test.Identifable
 import com.vicpin.kpresenteradapter.viewholder.LoadMoreViewHolder
@@ -230,7 +232,26 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
 
     fun notifyScrollStatus(recycler: RecyclerView) {
         this.mRecyclerView = recycler
-        recycler?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+        recycler.findParent(CoordinatorLayout::class.java)?.let { coordinator ->
+            (coordinator as ViewGroup).findChild(AppBarLayout::class.java)?.let { appBar ->
+
+                var lastOffset = -1
+
+                (appBar as AppBarLayout).addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBar, offset ->
+                    if(lastOffset == -1 || Math.abs(offset - lastOffset) > 100) {
+                        lastOffset = offset
+                        notifyScrollStateToCurrentViews(recycler, AbsListView.OnScrollListener.SCROLL_STATE_IDLE)
+                    }
+                })
+            }
+        }
+
+
+        recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+            var lastOffset = -1
+            var totalScrolled = 0
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -240,7 +261,10 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
                         dy
                     } else { dx }
 
-                    if(Math.abs(offset) < 3) {
+                    totalScrolled += offset
+
+                    if(lastOffset == -1 || Math.abs(totalScrolled - lastOffset) > 100) {
+                        lastOffset = totalScrolled
                         notifyScrollStateToCurrentViews(recycler, AbsListView.OnScrollListener.SCROLL_STATE_IDLE)
                     }
                 }
@@ -254,15 +278,33 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
     }
 
     private fun notifyScrollStateToCurrentViews(recycler: RecyclerView, state: Int) {
+
+        val recyclerRect = Rect()
+        recycler.getGlobalVisibleRect(recyclerRect)
+        val recyclerRectF = RectF(recyclerRect)
+
         recycler.forEachVisibleView { position ->
 
             recycler.findViewHolderForAdapterPosition(position)?.let {
                 (it as? ViewHolder<*>)?.apply {
+
+                    val rowRect = Rect()
+                    it.containerView?.getGlobalVisibleRect(rowRect)
+                    val rowRectF = RectF(rowRect)
+
+
                     this@PresenterAdapter.scrollState = state
+
                     setScrollState(state)
 
                     if (isScrollStopped(state)) {
                         onScrollStopped()
+                    }
+
+                    //Check effective visibility
+                    if(recyclerRectF.contains(rowRectF) && !visible) {
+                        onShowed()
+                        visible = true
                     }
                 }
             }

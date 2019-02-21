@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewParent
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vicpin.kpresenteradapter.ViewHolder
@@ -30,7 +31,6 @@ fun RecyclerView.applyScroll(position: Int, top: Int) {
     (layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(position, top)
 }
 
-
 fun <T : Any> RecyclerView.Adapter<out ViewHolder<T>>.refreshData(recyclerView: RecyclerView) {
     var (position, top) = recyclerView.getCurrentScroll()
     notifyDataSetChanged()
@@ -43,11 +43,26 @@ fun <T : Any> RecyclerView.Adapter<out ViewHolder<T>>.refreshData(recyclerView: 
  */
 fun RecyclerView.forEachVisibleView(doOnEach: (Int) -> Unit) {
 
-    if(layoutManager is LinearLayoutManager) {
+    if (layoutManager is LinearLayoutManager) {
         val firstPosition = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
         val lastPosition = (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
         for (i in firstPosition..lastPosition) {
             doOnEach(i)
         }
     }
+}
+
+fun View.findParent(type: Class<*>): View? {
+    var myParent: ViewParent? = parent
+    while (myParent != null && myParent is View) {
+        if(type.isAssignableFrom(myParent.javaClass)) {
+            return myParent
+        }
+        myParent = (myParent as View).parent
+    }
+    return null
+}
+
+fun ViewGroup.findChild(type: Class<*>): View? {
+   return (0 until childCount).map { getChildAt(it) }.find { type.isAssignableFrom(it.javaClass) }
 }
