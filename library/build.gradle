@@ -46,6 +46,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'com.github.vicpinm:autosubscription:1.0.2'
+    implementation "com.google.android.material:material:1.0.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     api 'com.github.vicpinm:kpresenteradapter-annotations:2.0.0'
     testImplementation 'com.google.truth:truth:0.42'
