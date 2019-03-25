@@ -132,6 +132,8 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
             isNormalPosition(position) -> {
                 holder.onBind(data, getPositionWithoutHeaders(position), this@PresenterAdapter.scrollState, deleteListener = {
                     removeItem(getPositionWithoutHeaders(holder.adapterPosition))
+                }, refreshViewsListener = {
+                    mRecyclerView?.refreshVisibleViews()
                 })
                 appendListeners(holder)
             }
@@ -229,6 +231,9 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
 
     fun getHeadersCount(): Int = headers.size
 
+    fun attachRecyclerView(recycler: RecyclerView) {
+        this.mRecyclerView = recycler
+    }
 
     fun notifyScrollStatus(recycler: RecyclerView) {
         this.mRecyclerView = recycler
@@ -268,7 +273,6 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
                         notifyScrollStateToCurrentViews(recycler, AbsListView.OnScrollListener.SCROLL_STATE_IDLE)
                     }
                 }
-
             }
 
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {

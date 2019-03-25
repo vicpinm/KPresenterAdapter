@@ -27,8 +27,10 @@ abstract class ViewHolder<T: Any> : RecyclerView.ViewHolder, LayoutContainer {
         context = itemView.context
     }
 
-    fun <A: T> onBind(data: List<A>, position: Int, scrollState: Int, deleteListener: () -> Unit){
-        setupPresenter(data, deleteListener, scrollState)
+    fun <A: T> onBind(data: List<A>, position: Int, scrollState: Int,
+                      deleteListener: () -> Unit,
+                      refreshViewsListener: () -> Unit){
+        setupPresenter(data, deleteListener, refreshViewsListener, scrollState)
         presenter?.data = data[position]
         presenter?.onCreate()
     }
@@ -54,11 +56,13 @@ abstract class ViewHolder<T: Any> : RecyclerView.ViewHolder, LayoutContainer {
     }
 
 
-    private fun <A: T> setupPresenter(data: List<A>, listener: (() -> Unit)? = null, scrollState: Int = 0){
+    private fun <A: T> setupPresenter(data: List<A>, listener: (() -> Unit)? = null,
+                                      updateViewsListener: (() -> Unit)? = null, scrollState: Int = 0){
         presenter?.apply {
             setPresenterView(this@ViewHolder)
             dataCollection = data
             onDeleteListener = listener
+            refreshViewsListener = updateViewsListener
             this.scrollState = scrollState
         }
     }

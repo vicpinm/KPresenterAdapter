@@ -16,7 +16,9 @@ abstract class ViewHolderPresenter<Data : Any, PresenterView: Any> {
     var view: PresenterView? = null
     lateinit var data: Data
     lateinit var dataCollection: List<Data>
-    var onDeleteListener: (() -> Unit)? = null
+    internal var onDeleteListener: (() -> Unit)? = null
+    internal var refreshViewsListener: (() -> Unit)? = null
+
     var scrollState: Int = AbsListView.OnScrollListener.SCROLL_STATE_IDLE
 
     val presenterId: Int by lazy { presenterIdsGenerator.andIncrement }
@@ -64,6 +66,10 @@ abstract class ViewHolderPresenter<Data : Any, PresenterView: Any> {
 
     open fun onShowed() {
 
+    }
+
+    fun refreshVisibleViewHolders() {
+        refreshViewsListener?.invoke()
     }
 
 

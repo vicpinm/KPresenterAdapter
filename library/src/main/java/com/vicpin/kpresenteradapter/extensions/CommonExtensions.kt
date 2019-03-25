@@ -52,6 +52,17 @@ fun RecyclerView.forEachVisibleView(doOnEach: (Int) -> Unit) {
     }
 }
 
+fun RecyclerView.refreshVisibleViews() {
+
+    if (layoutManager is LinearLayoutManager) {
+        val firstPosition = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+        val lastPosition = (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+        (firstPosition .. lastPosition).forEach {
+            adapter?.notifyItemChanged(it)
+        }
+    }
+}
+
 fun View.findParent(type: Class<*>): View? {
     var myParent: ViewParent? = parent
     while (myParent != null && myParent is View) {
