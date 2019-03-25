@@ -15,6 +15,7 @@ import com.vicpin.kpresenteradapter.extensions.*
 import com.vicpin.kpresenteradapter.model.ViewInfo
 import com.vicpin.kpresenteradapter.test.Identifable
 import com.vicpin.kpresenteradapter.viewholder.LoadMoreViewHolder
+import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.reflect.KClass
 
@@ -38,10 +39,10 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
     var itemClickListener: ((item: T, view: ViewHolder<T>) -> Unit)? = null
     var itemLongClickListener: ((item: T, view: ViewHolder<T>) -> Unit)? = null
     var loadMoreListener: (() -> Unit)? = null
-    var mRecyclerView: RecyclerView? = null
+    var mRecyclerView: WeakReference<RecyclerView>? = null
 
     override fun getRecyclerView(): RecyclerView? {
-        return mRecyclerView
+        return mRecyclerView?.get()
     }
 
     var scrollState = AbsListView.OnScrollListener.SCROLL_STATE_IDLE
@@ -133,7 +134,7 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
                 holder.onBind(data, getPositionWithoutHeaders(position), this@PresenterAdapter.scrollState, deleteListener = {
                     removeItem(getPositionWithoutHeaders(holder.adapterPosition))
                 }, refreshViewsListener = {
-                    mRecyclerView?.refreshVisibleViews()
+                    mRecyclerView?.get()?.refreshVisibleViews()
                 })
                 appendListeners(holder)
             }
@@ -206,9 +207,7 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
         this.data = data.toMutableList()
         this.loadMoreInvoked = false
         if (enableAnimations) {
-
             submitList(data)
-
         } else {
             notifyDataSetChanged()
         }
@@ -232,11 +231,11 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
     fun getHeadersCount(): Int = headers.size
 
     fun attachRecyclerView(recycler: RecyclerView) {
-        this.mRecyclerView = recycler
+        this.mRecyclerView = WeakReference(recycler)
     }
 
     fun notifyScrollStatus(recycler: RecyclerView) {
-        this.mRecyclerView = recycler
+        this.mRecyclerView = WeakReference(recycler)
 
         recycler.findParent(CoordinatorLayout::class.java)?.let { coordinator ->
             (coordinator as ViewGroup).findChild(AppBarLayout::class.java)?.let { appBar ->
@@ -466,8 +465,12 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
 
 
     fun enableAnimations(recyclerView: RecyclerView) {
-        this.mRecyclerView = recyclerView
+        this.mRecyclerView = WeakReference(recyclerView)
         this.enableAnimations = true
+    }
+
+    fun disableAnimations() {
+        this.enableAnimations = false
     }
 
 
