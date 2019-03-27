@@ -54,7 +54,7 @@ fun RecyclerView.forEachVisibleView(doOnEach: (Int) -> Unit) {
 
 fun RecyclerView.refreshVisibleViews() {
 
-    if (layoutManager is LinearLayoutManager) {
+    if (layoutManager is LinearLayoutManager && !isComputingLayout) {
         val firstPosition = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
         val lastPosition = (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
         (firstPosition .. lastPosition).forEach {
