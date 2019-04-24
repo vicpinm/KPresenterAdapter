@@ -129,33 +129,34 @@ abstract class MyListAdapter<T, VH : RecyclerView.ViewHolder> : RecyclerView.Ada
     }
 
     abstract fun getRecyclerView(): RecyclerView?
+    abstract fun getHeadersCount(): Int
 
     inner class MyListUpdateCallback
     (private val mAdapter: RecyclerView.Adapter<*>) : ListUpdateCallback {
 
         /** {@inheritDoc}  */
         override fun onInserted(position: Int, count: Int) {
-            mAdapter.notifyItemRangeInserted(position, count)
+            mAdapter.notifyItemRangeInserted(position + getHeadersCount(), count)
         }
 
         /** {@inheritDoc}  */
         override fun onRemoved(position: Int, count: Int) {
-            mAdapter.notifyItemRangeRemoved(position, count)
+            mAdapter.notifyItemRangeRemoved(position + getHeadersCount(), count)
         }
 
         /** {@inheritDoc}  */
         override fun onMoved(fromPosition: Int, toPosition: Int) {
-            val recyclerViewState = getRecyclerView()?.getLayoutManager()?.onSaveInstanceState()
+            val recyclerViewState = getRecyclerView()?.layoutManager?.onSaveInstanceState()
 
-            mAdapter.notifyItemMoved(fromPosition, toPosition)
+            mAdapter.notifyItemMoved(fromPosition + getHeadersCount(), toPosition + getHeadersCount())
 
-            getRecyclerView()?.getLayoutManager()?.onRestoreInstanceState(recyclerViewState);
+            getRecyclerView()?.layoutManager?.onRestoreInstanceState(recyclerViewState)
 
         }
 
         /** {@inheritDoc}  */
         override fun onChanged(position: Int, count: Int, payload: Any?) {
-            mAdapter.notifyItemRangeChanged(position, count, payload)
+            mAdapter.notifyItemRangeChanged(position + getHeadersCount(), count, payload)
         }
     }
 }

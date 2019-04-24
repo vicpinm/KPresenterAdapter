@@ -3,6 +3,7 @@ package com.vicpin.kpresenteradapter
 import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Handler
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.AbsListView
 import androidx.annotation.LayoutRes
@@ -18,8 +19,6 @@ import com.vicpin.kpresenteradapter.viewholder.LoadMoreViewHolder
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.reflect.KClass
-
-
 
 /**
  * Created by Victor on 01/11/2016.
@@ -61,7 +60,6 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
     private var HEADER_MAX_TYPE = HEADER_TYPE
     private var enableAnimations = false
 
-
     companion object {
         const val LOAD_MORE_TYPE = Int.MAX_VALUE
         const val HEADER_TYPE = Int.MIN_VALUE
@@ -80,11 +78,9 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
         }
     }
 
-
     private fun getViewInfoForType(viewType: Int) =
             if (isHeaderType(viewType)) headers[viewType - HEADER_TYPE]
             else registeredViewInfo[viewType]
-
 
     private fun isHeaderType(viewType: Int) = viewType >= HEADER_TYPE && viewType < HEADER_MAX_TYPE
 
@@ -153,9 +149,7 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
 
     fun getPositionWithoutHeaders(position: Int) = position - headers.size
 
-
     fun getPositionWithHeaders(position: Int) = position + headers.size
-
 
     private fun notifyLoadMoreReached() {
         if (loadMoreListener != null && !loadMoreInvoked) {
@@ -186,10 +180,16 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
 
     override fun getItem(position: Int) = data[getPositionWithoutHeaders(position)]
 
-
     fun addHeader(@LayoutRes layout: Int, viewHolderClass: KClass<out ViewHolder<T>>? = null) {
         this.headers.add(ViewInfo(viewHolderClass, layout))
         HEADER_MAX_TYPE = HEADER_TYPE + headers.size
+    }
+
+    fun removeHeaderAtPosition(position: Int) {
+        if (headers.size > position) {
+            this.headers.removeAt(position)
+            notifyItemRemoved(position)
+        }
     }
 
     fun updateHeaders() {
@@ -208,6 +208,16 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
         this.loadMoreInvoked = false
         if (enableAnimations) {
             submitList(data)
+
+            //Bugfix: sometimes, onBindViewHolder is not invoked for load more position when
+            //animations are enabled and scroll is performed quickly. Aways invoke it manually to ensure it is called.
+            if (loadMoreEnabled) {
+                Handler().postDelayed({
+                    if (isLoadMorePosition(itemCount - 1)) {
+                        notifyItemChanged(itemCount - 1)
+                    }
+                }, 100)
+            }
         } else {
             notifyDataSetChanged()
         }
@@ -228,7 +238,7 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
 
     override fun getItemCount() = data.size + headers.size + if (loadMoreEnabled) 1 else 0
 
-    fun getHeadersCount(): Int = headers.size
+    override fun getHeadersCount(): Int = headers.size
 
     fun attachRecyclerView(recycler: RecyclerView) {
         this.mRecyclerView = WeakReference(recycler)
@@ -243,7 +253,7 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
                 var lastOffset = -1
 
                 (appBar as AppBarLayout).addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBar, offset ->
-                    if(lastOffset == -1 || Math.abs(offset - lastOffset) > 100) {
+                    if (lastOffset == -1 || Math.abs(offset - lastOffset) > 100) {
                         lastOffset = offset
                         notifyScrollStateToCurrentViews(recycler, AbsListView.OnScrollListener.SCROLL_STATE_IDLE)
                     }
@@ -261,13 +271,15 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
                 super.onScrolled(recyclerView, dx, dy)
 
                 (recycler.layoutManager as? LinearLayoutManager)?.let {
-                    val offset = if(it.orientation == LinearLayoutManager.VERTICAL) {
+                    val offset = if (it.orientation == LinearLayoutManager.VERTICAL) {
                         dy
-                    } else { dx }
+                    } else {
+                        dx
+                    }
 
                     totalScrolled += offset
 
-                    if(lastOffset == -1 || Math.abs(totalScrolled - lastOffset) > 100) {
+                    if (lastOffset == -1 || Math.abs(totalScrolled - lastOffset) > 100) {
                         lastOffset = totalScrolled
                         notifyScrollStateToCurrentViews(recycler, AbsListView.OnScrollListener.SCROLL_STATE_IDLE)
                     }
@@ -305,7 +317,7 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
                     }
 
                     //Check effective visibility
-                    if(recyclerRectF.contains(rowRectF) && !visible) {
+                    if (recyclerRectF.contains(rowRectF) && !visible) {
                         onShowed()
                         visible = true
                     }
@@ -341,7 +353,6 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
         this.data.clear()
         notifyDataSetChanged()
     }
-
 
     /**
      * Remove item object from data collection
@@ -462,7 +473,6 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
     }
 
     fun getData() = data
-
 
     fun enableAnimations(recyclerView: RecyclerView) {
         this.mRecyclerView = WeakReference(recyclerView)
