@@ -77,7 +77,11 @@ abstract class ViewHolder<T: Any> : RecyclerView.ViewHolder, LayoutContainer {
 
     fun onDestroy(){
         presenter?.onPreDestroy()
+    }
+
+    fun release(){
         customListener = null
+        onDestroy()
     }
 
     fun setScrollState(state: Int) {
