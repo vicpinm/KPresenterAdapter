@@ -31,7 +31,7 @@ data class ViewInfo<out T: Any>(val viewHolderClass: KClass<out ViewHolder<*>>? 
         } else {
             object : ViewHolder<T>(view) {
                 override val containerView = view
-                override val presenter = null
+                override var presenter = null
             }
 
         }

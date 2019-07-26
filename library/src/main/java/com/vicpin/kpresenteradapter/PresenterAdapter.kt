@@ -483,6 +483,14 @@ abstract class PresenterAdapter<T : Any>() : MyListAdapter<T, ViewHolder<T>>(Dif
         this.enableAnimations = false
     }
 
+    fun release() {
+        itemClickListener = null
+        itemLongClickListener = null
+        loadMoreListener = null
+        mRecyclerView?.clear()
+        mRecyclerView = null
+    }
+
 
 }
 
